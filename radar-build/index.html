@@ -2243,9 +2243,7 @@
       <div class="swipe-header">
         <button class="back-btn" onclick="showScreen('home')">← Back</button>
         <div class="swipe-card-counter" id="swipe-card-counter">Card <span>1</span> of <span>0</span></div>
-        <button class="saved-btn" onclick="showScreen('favorites')" style="background: var(--gold); color: var(--bg-primary); border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">
-          Saved <span id="fav-count" style="background: var(--bg-primary); color: var(--gold); padding: 2px 6px; border-radius: 10px; margin-left: 4px;">0</span>
-        </button>
+        <div></div>
       </div>
 
       <div class="card-stack" id="card-stack">
@@ -2253,7 +2251,7 @@
         <div class="swipe-indicator left">⏭️</div>
         <div class="swipe-indicator right">🎨</div>
         <div class="swipe-indicator up">🚫</div>
-        <div class="swipe-indicator down">📌</div>
+        <div class="swipe-indicator down">⏭</div>
       </div>
 
       <div class="swipe-hints">
@@ -2264,7 +2262,7 @@
           <div class="arrow">↑ NOT INTERESTED</div>
         </div>
         <div class="hint delete">
-          <div class="arrow">↓ SAVE</div>
+          <div class="arrow">↓ SKIP</div>
         </div>
         <div class="hint create">
           <div class="arrow">CREATE →</div>
@@ -2480,21 +2478,6 @@
       </div>
     </div>
 
-    <!-- SCREEN 5: FAVORITES / SAVED -->
-    <div id="screen-favorites" class="screen">
-      <div class="favorites-header">
-        <button class="back-btn" onclick="showScreen('swipe')">← Back</button>
-        <h1>Saved Articles</h1>
-        <button class="clear-all-btn" onclick="clearAllSaved()" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer;">Clear All</button>
-      </div>
-
-      <div class="favorites-list" id="favorites-list">
-        <div class="favorites-empty">
-          <div class="icon">📌</div>
-          <p>No saved articles yet.<br>Swipe down on articles to save them!</p>
-        </div>
-      </div>
-    </div>
 
     <!-- Article Detail Modal -->
     <div class="article-modal" id="article-modal">
@@ -2678,13 +2661,15 @@
         const quote = inspiringQuotes[Math.floor(Math.random() * inspiringQuotes.length)];
 
         // Call backend to generate audio summary
+        const intro = 'This AI Radar summary is brought to you by JJ Shay at jjshay.com — where you can find other projects and over 70 free AI reports to download.';
+        const fullSummary = intro + ' ... ' + (article.summary || article.description || '');
         const response = await fetch(`${API_BASE}/audio-summary`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             title: article.title,
             source: article.source || '',
-            summary: article.summary || article.description || '',
+            summary: fullSummary,
             quote: quote
           })
         });
@@ -3817,10 +3802,8 @@
           showToast('Not interested 👎');
           break;
         case 'down':
-          // SAVE FOR LATER
           exitY = window.innerHeight;
-          addToSavedForLater(article);
-          showToast('Saved for later 📌');
+          showToast('Skipped');
           break;
       }
 

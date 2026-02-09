@@ -2243,7 +2243,9 @@
       <div class="swipe-header">
         <button class="back-btn" onclick="showScreen('home')">← Back</button>
         <div class="swipe-card-counter" id="swipe-card-counter">Card <span>1</span> of <span>0</span></div>
-        <div></div>
+        <button class="saved-btn" onclick="showScreen('favorites')" style="background: var(--gold); color: var(--bg-primary); border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">
+          Saved <span id="fav-count" style="background: var(--bg-primary); color: var(--gold); padding: 2px 6px; border-radius: 10px; margin-left: 4px;">0</span>
+        </button>
       </div>
 
       <div class="card-stack" id="card-stack">
@@ -2251,7 +2253,7 @@
         <div class="swipe-indicator left">⏭️</div>
         <div class="swipe-indicator right">🎨</div>
         <div class="swipe-indicator up">🚫</div>
-        <div class="swipe-indicator down">⏭</div>
+        <div class="swipe-indicator down">📌</div>
       </div>
 
       <div class="swipe-hints">
@@ -2262,7 +2264,7 @@
           <div class="arrow">↑ NOT INTERESTED</div>
         </div>
         <div class="hint delete">
-          <div class="arrow">↓ SKIP</div>
+          <div class="arrow">↓ SAVE</div>
         </div>
         <div class="hint create">
           <div class="arrow">CREATE →</div>
@@ -2478,6 +2480,21 @@
       </div>
     </div>
 
+    <!-- SCREEN 5: FAVORITES / SAVED -->
+    <div id="screen-favorites" class="screen">
+      <div class="favorites-header">
+        <button class="back-btn" onclick="showScreen('swipe')">← Back</button>
+        <h1>Saved Articles</h1>
+        <button class="clear-all-btn" onclick="clearAllSaved()" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer;">Clear All</button>
+      </div>
+
+      <div class="favorites-list" id="favorites-list">
+        <div class="favorites-empty">
+          <div class="icon">📌</div>
+          <p>No saved articles yet.<br>Swipe down on articles to save them!</p>
+        </div>
+      </div>
+    </div>
 
     <!-- Article Detail Modal -->
     <div class="article-modal" id="article-modal">
@@ -2616,11 +2633,7 @@
     // ============================================
     // STATE
     // ============================================
-    // API_BASE: Update PRODUCTION_API after deploying backend to Railway
-    const PRODUCTION_API = 'https://web-production-08a17.up.railway.app';
-    const API_BASE = window.location.hostname === 'localhost'
-      ? 'http://localhost:5050'
-      : PRODUCTION_API;
+    const API_BASE = 'https://web-production-08a17.up.railway.app';
     // Use CORS proxy for browser access (needed for API calls from deployed site)
     const CORS_PROXY = 'https://corsproxy.io/?';
 
@@ -3137,7 +3150,7 @@
         let directArticles = [];
 
         if (source === 'newsapi') {
-          const resp = await fetch(`/api/newsapi?q=${encodeURIComponent(selectedTopic)}&pageSize=20`);
+          const resp = await fetch(`https://ai-radar-demo.vercel.app/api/newsapi?q=${encodeURIComponent(selectedTopic)}&pageSize=20`);
           const data = await resp.json();
           if (data.articles) {
             directArticles = data.articles.map(a => {
@@ -3157,7 +3170,7 @@
             });
           }
         } else if (source === 'newsdata') {
-          const resp = await fetch(`/api/newsdata?q=${encodeURIComponent(selectedTopic)}&language=en`);
+          const resp = await fetch(`https://ai-radar-demo.vercel.app/api/newsdata?q=${encodeURIComponent(selectedTopic)}&language=en`);
           const data = await resp.json();
           if (data.results) {
             directArticles = data.results.map(a => {
@@ -3177,7 +3190,7 @@
             });
           }
         } else if (source === 'perplexity') {
-          const resp = await fetch('/api/perplexity', {
+          const resp = await fetch('https://ai-radar-demo.vercel.app/api/perplexity', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -3209,7 +3222,7 @@
             } catch (e) { console.log('Perplexity parse error:', e); }
           }
         } else if (source === 'grok') {
-          const resp = await fetch('/api/grok', {
+          const resp = await fetch('https://ai-radar-demo.vercel.app/api/grok', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -3804,8 +3817,10 @@
           showToast('Not interested 👎');
           break;
         case 'down':
+          // SAVE FOR LATER
           exitY = window.innerHeight;
-          showToast('Skipped');
+          addToSavedForLater(article);
+          showToast('Saved for later 📌');
           break;
       }
 

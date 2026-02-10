@@ -2434,17 +2434,15 @@
           <div class="arrow">← SKIP</div>
         </div>
         <div class="hint save">
-          <div class="arrow">↑ GO BACK</div>
+          <div class="arrow">↑ HOME</div>
         </div>
         <div class="hint delete">
-          <div class="arrow">↓ SKIP</div>
+          <div class="arrow">↓ BACK</div>
         </div>
         <div class="hint create">
           <div class="arrow">CREATE →</div>
         </div>
       </div>
-
-      <button class="home-btn" onclick="goHome()">🏠 Home</button>
     </div>
 
     <!-- SCREEN 3: ARTICLE DETAIL -->
@@ -4143,9 +4141,14 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
           goHome();
           return;
         case 'down':
-          exitY = window.innerHeight;
-          showToast('Skipped');
-          break;
+          // BACK - Go to previous card
+          card.style.transform = '';
+          if (currentCardIndex > 0) {
+            currentCardIndex--;
+            renderCards();
+            showToast('Back');
+          }
+          return;
       }
 
       card.style.transition = 'transform 0.3s ease';

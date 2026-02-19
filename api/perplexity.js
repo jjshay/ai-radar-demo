@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const API_KEY = (process.env.PERPLEXITY_KEY || process.env.PERPLEXITY_API_KEY || '').trim();
+  const API_KEY = (process.env.PERPLEXITY_KEY || process.env.PERPLEXITY_API_KEY || '').replace(/\s+/g, '');
   if (!API_KEY) {
     return res.status(500).json({ error: 'Perplexity API key not configured' });
   }

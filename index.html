@@ -3159,11 +3159,16 @@
     async function setTopicAndFetchCounts(topic) {
       selectedTopic = topic;
 
-      // Show loading state on all source buttons
+      // Clear previous articles and reset state for new topic
+      articles = [];
+      currentCardIndex = 0;
+
+      // Reset all source buttons
       const sources = ['newsapi', 'newsdata', 'perplexity', 'grok'];
       sources.forEach(source => {
         const btn = document.querySelector(`.source-btn[data-source="${source}"]`);
         if (btn) {
+          btn.classList.remove('done');
           const countEl = btn.querySelector('.count');
           if (countEl) countEl.textContent = '...';
         }
@@ -3289,8 +3294,12 @@
         } else if (source === 'newsdata') {
           const resp = await fetch(`/api/newsdata?q=${encodeURIComponent(selectedTopic)}&language=en`);
           const data = await resp.json();
-          if (data.results) {
-            directArticles = data.results.map(a => {
+          // Handle both data.results (v1) and data.data (v2) API formats
+          const results = (data.results && Array.isArray(data.results)) ? data.results
+            : (data.data && Array.isArray(data.data)) ? data.data
+            : [];
+          if (results.length > 0) {
+            directArticles = results.map(a => {
               const text = (a.title || '') + ' ' + (a.description || '') + ' ' + (a.content || '');
               return {
               id: Date.now() + Math.random(),
@@ -3559,8 +3568,8 @@
       let allResults = [];
       let apiSuccess = false;
 
-      try {
-        for (let batchIdx = 0; batchIdx < batches.length; batchIdx++) {
+      for (let batchIdx = 0; batchIdx < batches.length; batchIdx++) {
+        try {
           const batch = batches[batchIdx];
           const articleList = batch.items.map((a, i) =>
             `[${i}] "${a.title}" - ${(a.summary || '').substring(0, 200)}`
@@ -3594,7 +3603,6 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
             body: JSON.stringify({
               model: 'grok-3-mini',
               messages: [{ role: 'user', content: prompt }],
-              response_format: { type: 'json_object' },
               temperature: 0.3
             })
           });
@@ -3603,13 +3611,21 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
 
           if (data.choices?.[0]?.message?.content) {
             let content = data.choices[0].message.content;
-            content = content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
-            const parsed = JSON.parse(content);
+            // Strip markdown code fences aggressively
+            content = content.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '').trim();
+            // Try to extract JSON object if surrounded by other text
+            const jsonMatch = content.match(/\{[\s\S]*\}/);
+            if (jsonMatch) content = jsonMatch[0];
 
-            if (parsed.results && Array.isArray(parsed.results)) {
-              allResults = [...allResults, ...parsed.results];
-              scoredCount += batch.items.length;
-              apiSuccess = true;
+            try {
+              const parsed = JSON.parse(content);
+              if (parsed.results && Array.isArray(parsed.results)) {
+                allResults = [...allResults, ...parsed.results];
+                scoredCount += batch.items.length;
+                apiSuccess = true;
+              }
+            } catch (parseErr) {
+              console.warn(`Batch ${batchIdx + 1} JSON parse failed:`, parseErr.message, content.substring(0, 200));
             }
           }
 
@@ -3627,9 +3643,9 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
 
           countEl.textContent = `${scoredCount} of ${articles.length} articles scored`;
           if (batchIdx < batches.length - 1) await sleep(300);
+        } catch (err) {
+          console.error(`AI Scoring batch ${batchIdx + 1} error:`, err);
         }
-      } catch (err) {
-        console.error('AI Scoring error:', err);
       }
 
       // Merge results into articles
@@ -4418,9 +4434,23 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
       let lastPercent = 0;
       let lastStep = 0;
       const config = CARD_CONFIGS[Object.keys(CARD_CONFIGS).find(k => CARD_CONFIGS[k].count === cardCount)] || CARD_CONFIGS.medium;
+      const pollStartTime = Date.now();
+      const POLL_TIMEOUT_MS = 45000; // 45 second timeout
 
       generationPollInterval = setInterval(async () => {
         try {
+          // Check for timeout
+          if (Date.now() - pollStartTime > POLL_TIMEOUT_MS) {
+            clearInterval(generationPollInterval);
+            console.warn('Generation polling timed out after 45s, falling back to simulation');
+            document.getElementById('gen-step-description').textContent = 'Backend timeout - using demo mode...';
+            showToast('Backend timed out, using demo mode');
+            setTimeout(() => {
+              runGenerationSimulation(cardCount);
+            }, 1000);
+            return;
+          }
+
           const response = await fetch(`${API_BASE}/status/${currentJobId}`);
           const status = await response.json();
 

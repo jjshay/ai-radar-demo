@@ -2576,18 +2576,28 @@
     }
 
     async function fetchAllSourcesAuto() {
-      const allSources = ['newsapi', 'newsdata', 'perplexity', 'grok'];
+      // Run all 6 API calls in TRUE parallel (not sequential sub-calls)
+      const fetchers = [
+        fetchSource('newsapi'),
+        fetchSource('newsdata'),
+        fetchPerplexityBreaking(),
+        fetchPerplexityAnalysis(),
+        fetchGrokAnalysis(),
+        fetchGrokPredictions()
+      ];
 
-      // Fetch all 4 sources in parallel
-      const results = await Promise.allSettled(
-        allSources.map(source => fetchSource(source))
-      );
+      const results = await Promise.allSettled(fetchers);
+
+      // Log per-source counts
+      const counts = {};
+      articles.forEach(a => { counts[a.source] = (counts[a.source] || 0) + 1; });
+      console.log('Per-source article counts:', JSON.stringify(counts));
 
       // Hide fetching indicator
       const indicator = document.getElementById('topic-fetching-indicator');
       if (indicator) indicator.classList.remove('visible');
 
-      console.log(`Fetched ${articles.length} articles from ${allSources.length} sources`);
+      console.log(`Fetched ${articles.length} articles from 6 parallel calls`);
 
       // Show AI scoring animation screen
       showScreen('scoring');
@@ -2663,8 +2673,8 @@
       // --- FILTER: Remove articles under 40 words ---
       try {
         const beforeFilter = articles.length;
-        const filtered = articles.filter(a => (a.words || 0) >= 40);
-        if (beforeFilter - filtered.length > 0) console.log(`Filtered out ${beforeFilter - filtered.length} articles under 40 words`);
+        const filtered = articles.filter(a => (a.words || 0) >= 20);
+        if (beforeFilter - filtered.length > 0) console.log(`Filtered out ${beforeFilter - filtered.length} articles under 20 words`);
         articles = filtered.length > 0 ? filtered : articles;
       } catch (e) { console.error('Filter error:', e); }
 
@@ -2734,7 +2744,136 @@
     }
 
     // ============================================
-    // HOME SCREEN - FETCH SOURCES
+    // STANDALONE PARALLEL FETCH FUNCTIONS
+    // ============================================
+    function parsePerplexityResponse(data) {
+      if (!data.choices?.[0]?.message?.content) return [];
+      let content = data.choices[0].message.content;
+      content = content.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '').trim();
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (jsonMatch) content = jsonMatch[0];
+      return JSON.parse(content).map(a => {
+        const text = (a.title || '') + ' ' + (a.summary || '');
+        return {
+          id: Date.now() + Math.random(),
+          title: a.title,
+          summary: a.summary || '',
+          url: a.url,
+          image: a.imageUrl || null,
+          source: 'perplexity',
+          publishedAt: a.publishedAt,
+          date: formatDate(a.publishedAt || new Date().toISOString()),
+          words: text.split(/\s+/).filter(w => w).length
+        };
+      });
+    }
+
+    function parseGrokResponse(data) {
+      if (!data.choices?.[0]?.message?.content) return [];
+      let content = data.choices[0].message.content;
+      content = content.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '').trim();
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (jsonMatch) content = jsonMatch[0];
+      return JSON.parse(content).map(a => {
+        const text = (a.title || '') + ' ' + (a.summary || '');
+        return {
+          id: Date.now() + Math.random(),
+          title: a.title,
+          summary: a.summary || '',
+          url: (a.url && a.url !== '#') ? a.url : '',
+          source: 'grok',
+          publishedAt: a.publishedAt,
+          date: formatDate(a.publishedAt || new Date().toISOString()),
+          words: text.split(/\s+/).filter(w => w).length
+        };
+      });
+    }
+
+    async function fetchPerplexityBreaking() {
+      const today = new Date().toISOString().split('T')[0];
+      const resp = await fetch('/api/perplexity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'sonar',
+          messages: [
+            { role: 'system', content: 'You are a news research assistant. Return ONLY valid JSON arrays. Every URL must be a real, verifiable article link.' },
+            { role: 'user', content: `Find 15 breaking news articles from the past 7 days (today is ${today}) about "${selectedTopic}". Focus on the most impactful, widely-reported stories with real facts and figures. Return as a JSON array: [{"title":"...","summary":"...","url":"https://...","publishedAt":"YYYY-MM-DD","imageUrl":"..."}]` }
+          ]
+        }),
+        signal: AbortSignal.timeout(15000)
+      });
+      const data = await resp.json();
+      const parsed = parsePerplexityResponse(data);
+      parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
+      articles = [...articles, ...parsed];
+      console.log(`Perplexity-breaking: ${parsed.length} articles`);
+    }
+
+    async function fetchPerplexityAnalysis() {
+      const resp = await fetch('/api/perplexity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'sonar',
+          messages: [
+            { role: 'system', content: 'You are an industry research analyst. Return ONLY valid JSON arrays. Every URL must be a real, verifiable article link.' },
+            { role: 'user', content: `Find 15 in-depth industry analysis articles, research reports, and expert opinion pieces from the past 30 days about "${selectedTopic}". Focus on strategic insights, market data, and expert commentary - NOT breaking news. Return as a JSON array: [{"title":"...","summary":"...","url":"https://...","publishedAt":"YYYY-MM-DD","imageUrl":"..."}]` }
+          ]
+        }),
+        signal: AbortSignal.timeout(15000)
+      });
+      const data = await resp.json();
+      const parsed = parsePerplexityResponse(data);
+      parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
+      articles = [...articles, ...parsed];
+      console.log(`Perplexity-analysis: ${parsed.length} articles`);
+    }
+
+    async function fetchGrokAnalysis() {
+      const resp = await fetch('/api/grok', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'grok-3-mini',
+          messages: [
+            { role: 'system', content: 'You are an industry analyst. Return ONLY valid JSON arrays. Focus on analysis and expert opinions. Do NOT fabricate URLs - use "#" for the url field.' },
+            { role: 'user', content: `List 15 important developments, expert analyses, or emerging trends in "${selectedTopic}" that professionals should know about. Focus on specific companies, deals, technologies, or policy changes. For each, write a detailed 4-5 sentence analytical summary. Return as a JSON array: [{"title":"...","summary":"...","url":"#","publishedAt":"YYYY-MM-DD"}]` }
+          ],
+          temperature: 0.7
+        }),
+        signal: AbortSignal.timeout(15000)
+      });
+      const data = await resp.json();
+      const parsed = parseGrokResponse(data);
+      parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
+      articles = [...articles, ...parsed];
+      console.log(`Grok-analysis: ${parsed.length} articles`);
+    }
+
+    async function fetchGrokPredictions() {
+      const resp = await fetch('/api/grok', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'grok-3-mini',
+          messages: [
+            { role: 'system', content: 'You are a forward-looking technology strategist. Return ONLY valid JSON arrays. Do NOT fabricate URLs - use "#" for the url field.' },
+            { role: 'user', content: `List 15 bold predictions, contrarian perspectives, and emerging opportunities in "${selectedTopic}" for the next 6-12 months. Include specific company moves, funding rounds, regulatory shifts, and technology breakthroughs that most people are missing. For each, write a 4-5 sentence summary explaining the thesis. Return as a JSON array: [{"title":"...","summary":"...","url":"#","publishedAt":"YYYY-MM-DD"}]` }
+          ],
+          temperature: 0.9
+        }),
+        signal: AbortSignal.timeout(15000)
+      });
+      const data = await resp.json();
+      const parsed = parseGrokResponse(data);
+      parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
+      articles = [...articles, ...parsed];
+      console.log(`Grok-predictions: ${parsed.length} articles`);
+    }
+
+    // ============================================
+    // HOME SCREEN - FETCH SOURCES (NewsAPI/NewsData only)
     // ============================================
     async function fetchSource(source) {
       const btn = document.querySelector(`.source-btn[data-source="${source}"]`);
@@ -2786,146 +2925,8 @@
             };
             });
           }
-        } else if (source === 'perplexity') {
-          // Perplexity sonar has live web search - two calls: breaking news + industry analysis
-          const today = new Date().toISOString().split('T')[0];
-
-          // Call 1: Breaking news
-          const resp1 = await fetch('/api/perplexity', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: 'sonar',
-              messages: [
-                { role: 'system', content: 'You are a news research assistant. Return ONLY valid JSON arrays. Every URL must be a real, verifiable article link.' },
-                { role: 'user', content: `Find 15 breaking news articles from the past 7 days (today is ${today}) about "${selectedTopic}". Focus on the most impactful, widely-reported stories with real facts and figures. Return as a JSON array: [{"title":"...","summary":"...","url":"https://...","publishedAt":"YYYY-MM-DD","imageUrl":"..."}]` }
-              ]
-            }),
-            signal: AbortSignal.timeout(15000)
-          });
-          const data1 = await resp1.json();
-          if (data1.choices?.[0]?.message?.content) {
-            try {
-              let content = data1.choices[0].message.content;
-              content = content.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '').trim();
-              const jsonMatch = content.match(/\[[\s\S]*\]/);
-              if (jsonMatch) content = jsonMatch[0];
-              const parsed = JSON.parse(content);
-              directArticles = parsed.map(a => {
-                const text = (a.title || '') + ' ' + (a.summary || '');
-                return {
-                  id: Date.now() + Math.random(),
-                  title: a.title,
-                  summary: a.summary || '',
-                  url: a.url,
-                  image: a.imageUrl || null,
-                  source: 'perplexity',
-                  publishedAt: a.publishedAt,
-                  date: formatDate(a.publishedAt || new Date().toISOString()),
-                  words: text.split(/\s+/).filter(w => w).length
-                };
-              });
-            } catch (e) { console.log('Perplexity call 1 parse error:', e); }
-          }
-
-          // Call 2: Industry deep dives and expert analysis
-          try {
-            const resp2 = await fetch('/api/perplexity', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                model: 'sonar',
-                messages: [
-                  { role: 'system', content: 'You are an industry research analyst. Return ONLY valid JSON arrays. Every URL must be a real, verifiable article link.' },
-                  { role: 'user', content: `Find 15 in-depth industry analysis articles, research reports, and expert opinion pieces from the past 30 days about "${selectedTopic}". Focus on strategic insights, market data, and expert commentary - NOT breaking news. Return as a JSON array: [{"title":"...","summary":"...","url":"https://...","publishedAt":"YYYY-MM-DD","imageUrl":"..."}]` }
-                ]
-              }),
-              signal: AbortSignal.timeout(15000)
-            });
-            const data2 = await resp2.json();
-            if (data2.choices?.[0]?.message?.content) {
-              let content = data2.choices[0].message.content;
-              content = content.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '').trim();
-              const jsonMatch = content.match(/\[[\s\S]*\]/);
-              if (jsonMatch) content = jsonMatch[0];
-              const parsed = JSON.parse(content);
-              const moreArticles = parsed.map(a => {
-                const text = (a.title || '') + ' ' + (a.summary || '');
-                return {
-                  id: Date.now() + Math.random(),
-                  title: a.title,
-                  summary: a.summary || '',
-                  url: a.url,
-                  image: a.imageUrl || null,
-                  source: 'perplexity',
-                  publishedAt: a.publishedAt,
-                  date: formatDate(a.publishedAt || new Date().toISOString()),
-                  words: text.split(/\s+/).filter(w => w).length
-                };
-              });
-              directArticles = [...directArticles, ...moreArticles];
-            }
-          } catch (e) { console.log('Perplexity call 2 error:', e); }
-        } else if (source === 'grok') {
-          // Grok - two calls: industry analysis + predictions/emerging trends
-          const parseGrokResponse = (data) => {
-            if (!data.choices?.[0]?.message?.content) return [];
-            let content = data.choices[0].message.content;
-            content = content.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '').trim();
-            const jsonMatch = content.match(/\[[\s\S]*\]/);
-            if (jsonMatch) content = jsonMatch[0];
-            return JSON.parse(content).map(a => {
-              const text = (a.title || '') + ' ' + (a.summary || '');
-              return {
-                id: Date.now() + Math.random(),
-                title: a.title,
-                summary: a.summary || '',
-                url: (a.url && a.url !== '#') ? a.url : '',
-                source: 'grok',
-                publishedAt: a.publishedAt,
-                date: formatDate(a.publishedAt || new Date().toISOString()),
-                words: text.split(/\s+/).filter(w => w).length
-              };
-            });
-          };
-
-          // Call 1: Key developments and industry analysis
-          const resp1 = await fetch('/api/grok', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: 'grok-3-mini',
-              messages: [
-                { role: 'system', content: 'You are an industry analyst. Return ONLY valid JSON arrays. Focus on analysis and expert opinions. Do NOT fabricate URLs - use "#" for the url field.' },
-                { role: 'user', content: `List 15 important developments, expert analyses, or emerging trends in "${selectedTopic}" that professionals should know about. Focus on specific companies, deals, technologies, or policy changes. For each, write a detailed 4-5 sentence analytical summary. Return as a JSON array: [{"title":"...","summary":"...","url":"#","publishedAt":"YYYY-MM-DD"}]` }
-              ],
-              temperature: 0.7
-            }),
-            signal: AbortSignal.timeout(15000)
-          });
-          try {
-            directArticles = parseGrokResponse(await resp1.json());
-          } catch (e) { console.log('Grok call 1 parse error:', e); }
-
-          // Call 2: Predictions, contrarian takes, and what's next
-          try {
-            const resp2 = await fetch('/api/grok', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                model: 'grok-3-mini',
-                messages: [
-                  { role: 'system', content: 'You are a forward-looking technology strategist. Return ONLY valid JSON arrays. Do NOT fabricate URLs - use "#" for the url field.' },
-                  { role: 'user', content: `List 15 bold predictions, contrarian perspectives, and emerging opportunities in "${selectedTopic}" for the next 6-12 months. Include specific company moves, funding rounds, regulatory shifts, and technology breakthroughs that most people are missing. For each, write a 4-5 sentence summary explaining the thesis. Return as a JSON array: [{"title":"...","summary":"...","url":"#","publishedAt":"YYYY-MM-DD"}]` }
-                ],
-                temperature: 0.9
-              }),
-              signal: AbortSignal.timeout(15000)
-            });
-            const moreArticles = parseGrokResponse(await resp2.json());
-            directArticles = [...directArticles, ...moreArticles];
-          } catch (e) { console.log('Grok call 2 error:', e); }
         }
+        // Perplexity and Grok are now handled by standalone parallel functions
 
         if (directArticles.length > 0) {
           // Fill in missing images with topic-based placeholders

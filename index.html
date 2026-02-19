@@ -110,156 +110,6 @@
       text-align: center;
     }
 
-    /* Source Buttons Grid */
-    .sources-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      width: 100%;
-      max-width: 320px;
-      margin-bottom: 20px;
-    }
-
-    .source-btn {
-      background: rgba(255, 255, 255, 0.9);
-      border: 2px solid rgba(255, 255, 255, 0.5);
-      border-radius: 16px;
-      padding: 20px 15px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .source-btn .name,
-    .source-btn .count {
-      color: #1e3a5f;
-    }
-
-    .source-btn:active {
-      transform: scale(0.95);
-    }
-
-    .source-btn:hover {
-      border-color: var(--gold);
-      box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
-    }
-
-    .source-btn.selected {
-      background: var(--gold);
-      border-color: var(--gold);
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-    }
-
-    .source-btn.selected .name,
-    .source-btn.selected .count {
-      color: #1a1a1a;
-    }
-
-    .source-btn.fetching {
-      border-color: var(--linkedin-blue);
-      background: conic-gradient(
-        var(--linkedin-blue) var(--fill-progress, 0%),
-        var(--gold) var(--fill-progress, 0%)
-      );
-      animation: fill-corners 2.5s ease-in-out forwards;
-    }
-
-    .source-btn.fetching .name,
-    .source-btn.fetching .count {
-      color: #ffffff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    }
-
-    @keyframes fill-corners {
-      0% { --fill-progress: 0%; }
-      25% { --fill-progress: 25%; }
-      50% { --fill-progress: 50%; }
-      75% { --fill-progress: 75%; }
-      100% { --fill-progress: 100%; }
-    }
-
-    @property --fill-progress {
-      syntax: '<percentage>';
-      inherits: false;
-      initial-value: 0%;
-    }
-
-    .source-btn.done {
-      background: var(--linkedin-blue);
-      border-color: var(--linkedin-blue);
-      box-shadow: 0 0 20px rgba(10, 102, 194, 0.4);
-    }
-
-    .source-btn.done .name,
-    .source-btn.done .count {
-      color: #ffffff;
-    }
-
-    .source-btn.done .checkmark {
-      background: white;
-      color: var(--linkedin-blue);
-    }
-
-    .source-btn .checkmark {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 22px;
-      height: 22px;
-      background: var(--gold);
-      border-radius: 50%;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: var(--bg-primary);
-    }
-
-    .source-btn.selected .checkmark {
-      display: flex;
-    }
-
-    .source-btn {
-      position: relative;
-    }
-
-    @keyframes pulse-border {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
-      50% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
-    }
-
-    @keyframes pulse-text {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    .source-btn .icon {
-      width: 40px;
-      height: 40px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .source-btn .icon img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-
-    .source-btn .name {
-      font-size: 13px;
-      font-weight: 600;
-      color: #1e3a5f;
-    }
-
-    .source-btn .count {
-      font-size: 11px;
-      color: #1e3a5f;
-      margin-top: 4px;
-    }
-
     /* Topic Selector */
     .topic-selector {
       width: 100%;
@@ -306,36 +156,6 @@
     .topic-selector select optgroup {
       color: var(--gold);
       font-weight: 600;
-    }
-
-    /* Fetch All Button */
-    .fetch-all-btn {
-      width: 100%;
-      max-width: 320px;
-      padding: 18px;
-      background: var(--gold);
-      border: none;
-      border-radius: 16px;
-      font-size: 18px;
-      font-weight: 700;
-      color: #1a1a1a;
-      cursor: pointer;
-      margin-bottom: 15px;
-      transition: all 0.2s;
-    }
-
-    .fetch-all-btn:hover {
-      background: var(--gold-light);
-    }
-
-    .fetch-all-btn:active,
-    .fetch-all-btn.clicked {
-      background: #ffeb3b;
-      transform: scale(0.97);
-    }
-
-    .fetch-all-btn:disabled {
-      opacity: 0.5;
     }
 
     /* Favorites Button */
@@ -1526,113 +1346,6 @@
       cursor: pointer;
     }
 
-    /* Length Selection Modal */
-    .length-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(10, 22, 40, 0.95);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 250;
-      padding: 30px;
-    }
-
-    .length-modal.show {
-      display: flex;
-    }
-
-    .length-modal-content {
-      width: 100%;
-      max-width: 340px;
-    }
-
-    .length-modal h2 {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: white;
-    }
-
-    .length-modal .subtitle {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 14px;
-      margin-bottom: 30px;
-    }
-
-    .length-modal .length-options {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .length-modal .length-option {
-      background: white;
-      border: 2px solid rgba(0,0,0,0.1);
-      border-radius: 16px;
-      padding: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      transition: all 0.2s;
-    }
-
-    .length-modal .length-option:active {
-      transform: scale(0.98);
-    }
-
-    .length-modal .length-option:hover {
-      border-color: #0A66C2;
-      background: #0A66C2;
-    }
-    .length-modal .length-option:hover .length-info h3,
-    .length-modal .length-option:hover .length-info p,
-    .length-modal .length-option:hover .slides-count {
-      color: white;
-    }
-
-    .length-modal .length-option .slides-count {
-      width: 60px;
-      height: 60px;
-      background: #f5f5f5;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      color: var(--gold);
-      font-weight: 700;
-      color: var(--gold);
-    }
-
-    .length-modal .length-option .length-info h3 {
-      font-size: 18px;
-      margin-bottom: 4px;
-      color: #1a1a1a;
-    }
-
-    .length-modal .length-option .length-info p {
-      font-size: 13px;
-      color: #666;
-    }
-
-    .length-modal .cancel-btn {
-      width: 100%;
-      padding: 16px;
-      background: transparent;
-      border: 2px solid var(--bg-card);
-      border-radius: 16px;
-      font-size: 16px;
-      color: var(--text-muted);
-      cursor: pointer;
-      margin-top: 20px;
-    }
-
     /* ============================================
        CARD GENERATION SCREEN
        ============================================ */
@@ -1652,11 +1365,6 @@
       font-size: 18px;
       margin-bottom: 4px;
       color: var(--gold);
-    }
-
-    .generating-status {
-      color: var(--text-muted);
-      font-size: 12px;
     }
 
     /* Gamma Logo Highlight */
@@ -1971,13 +1679,137 @@
       cursor: pointer;
       margin: 0 auto;
     }
+    /* ============================================
+       SCREEN 0: INTRO
+       ============================================ */
+    #screen-intro {
+      justify-content: center;
+      align-items: center;
+      padding: 30px 24px;
+      background: var(--bg-primary);
+    }
+    .intro-logo-container {
+      display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 40px;
+    }
+    .intro-logo { width: 120px; height: 120px; }
+    .intro-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .intro-title { font-size: 28px; font-weight: 700; color: var(--gold); letter-spacing: 1px; text-align: center; }
+    .intro-subtitle { font-size: 14px; color: var(--text-muted); text-align: center; }
+    .intro-steps {
+      width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 16px; margin-bottom: 36px;
+    }
+    .intro-step {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--bg-secondary); border-radius: 14px; padding: 14px 16px;
+      border: 1px solid rgba(212, 175, 55, 0.15);
+    }
+    .intro-step .step-num-badge {
+      font-size: 16px; font-weight: 700; color: var(--gold);
+      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+      background: rgba(212, 175, 55, 0.1); border-radius: 50%; flex-shrink: 0;
+    }
+    .intro-step .step-text { display: flex; flex-direction: column; gap: 2px; }
+    .intro-step .step-label { font-size: 13px; font-weight: 700; color: var(--text); }
+    .intro-step .step-desc { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+    .intro-cta-btn {
+      width: 100%; max-width: 320px; padding: 18px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+      border: none; border-radius: 20px; font-size: 18px; font-weight: 700;
+      color: var(--bg-primary); cursor: pointer;
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .intro-cta-btn:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3); }
+
+    /* Help button on home screen */
+    .help-btn {
+      position: absolute; top: calc(var(--safe-top) + 12px); right: 16px;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3);
+      color: var(--gold); font-size: 18px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Fetching indicator */
+    .topic-fetching-indicator {
+      text-align: center; margin-top: 12px; font-size: 13px; color: var(--gold);
+      opacity: 0; transition: opacity 0.3s; height: 20px;
+    }
+    .topic-fetching-indicator.visible { opacity: 1; }
+
+    /* Two-phase generating */
+    .gen-phase-1 {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 20px; width: 100%; flex: 1;
+    }
+    .gen-phase-1-logo {
+      width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    .gen-phase-1-logo img { width: 80px; height: 80px; object-fit: contain; }
+    .gen-phase-1-message { font-size: 18px; font-weight: 600; color: white; text-align: center; max-width: 260px; line-height: 1.4; }
+    .gen-phase-1-sub { font-size: 13px; color: var(--text-muted); text-align: center; max-width: 280px; }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); transform: scale(1); }
+      50% { box-shadow: 0 0 60px rgba(212, 175, 55, 0.6); transform: scale(1.04); }
+    }
+    .gen-phase-2 { display: none; flex-direction: column; align-items: center; width: 100%; }
+    .gen-phase-2.active { display: flex; }
+
+    /* LinkedIn hidden until ready */
+    .linkedin-share-container.hidden { display: none; }
+    .linkedin-share-container.reveal { animation: fadeInUp 0.5s ease forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
   <div class="app">
 
+    <!-- SCREEN 0: INTRO (first visit only) -->
+    <div id="screen-intro" class="screen">
+      <div class="intro-logo-container">
+        <div class="intro-logo"><img src="assets/logo-white.png" alt="AI Radar"></div>
+        <div class="intro-title">AI Radar</div>
+        <div class="intro-subtitle">by JJ Shay</div>
+      </div>
+      <div class="intro-steps">
+        <div class="intro-step">
+          <div class="step-num-badge">1</div>
+          <div class="step-text">
+            <span class="step-label">Pick your industry</span>
+            <span class="step-desc">Choose from 20+ industries and sectors</span>
+          </div>
+        </div>
+        <div class="intro-step">
+          <div class="step-num-badge">2</div>
+          <div class="step-text">
+            <span class="step-label">Browse AI-scored articles</span>
+            <span class="step-desc">5 AI models rank the most relevant news</span>
+          </div>
+        </div>
+        <div class="intro-step">
+          <div class="step-num-badge">3</div>
+          <div class="step-text">
+            <span class="step-label">Swipe right to create</span>
+            <span class="step-desc">Turn any article into a LinkedIn presentation</span>
+          </div>
+        </div>
+        <div class="intro-step">
+          <div class="step-num-badge">4</div>
+          <div class="step-text">
+            <span class="step-label">Share to LinkedIn</span>
+            <span class="step-desc">Post AI-generated slides with one tap</span>
+          </div>
+        </div>
+      </div>
+      <button class="intro-cta-btn" onclick="startFromIntro()">Get Started</button>
+    </div>
+
     <!-- SCREEN 1: HOME -->
-    <div id="screen-home" class="screen active">
+    <div id="screen-home" class="screen">
+      <button class="help-btn" onclick="showIntro()" title="How it works">?</button>
+
       <div class="logo-container">
         <div class="logo-icon">
           <img src="assets/logo-white.png" alt="AI Radar">
@@ -1985,62 +1817,42 @@
         <div class="logo-tagline">Intelligence Engine</div>
       </div>
 
-      <!-- Topic Dropdown - At Top -->
+      <!-- Industry Picker -->
       <div class="topic-selector">
-        <label>Search Topic</label>
-        <select id="topic-dropdown" onchange="setTopicAndFetchCounts(this.value)">
+        <label>Pick Your Industry</label>
+        <select id="topic-dropdown" onchange="onIndustrySelect(this.value)">
+          <option value="" disabled selected>Choose an industry...</option>
           <optgroup label="AI & Technology">
-            <option value="artificial intelligence" selected>Artificial Intelligence</option>
+            <option value="artificial intelligence">Artificial Intelligence</option>
             <option value="machine learning">Machine Learning</option>
             <option value="large language models">Large Language Models</option>
             <option value="robotics">Robotics</option>
             <option value="autonomous vehicles">Autonomous Vehicles</option>
+            <option value="quantum computing">Quantum Computing</option>
+            <option value="edge computing">Edge Computing</option>
           </optgroup>
           <optgroup label="Business & Finance">
             <option value="startups">Startups & VC</option>
             <option value="fintech">Fintech</option>
             <option value="cryptocurrency">Cryptocurrency</option>
             <option value="stock market">Stock Market</option>
+            <option value="private equity">Private Equity</option>
+            <option value="mergers and acquisitions">Mergers & Acquisitions</option>
           </optgroup>
           <optgroup label="Industry">
             <option value="healthcare ai">Healthcare AI</option>
             <option value="climate tech">Climate Tech</option>
             <option value="cybersecurity">Cybersecurity</option>
             <option value="space technology">Space Technology</option>
+            <option value="manufacturing automation">Manufacturing</option>
+            <option value="retail technology">Retail Tech</option>
+            <option value="supply chain ai">Supply Chain</option>
+            <option value="proptech">Proptech</option>
           </optgroup>
         </select>
       </div>
 
-      <div class="sources-grid">
-        <div class="source-btn" data-source="newsapi" onclick="toggleSource('newsapi')">
-          <div class="checkmark">✓</div>
-          <div class="icon"><img src="assets/newsapi.png" alt="NewsAPI"></div>
-          <div class="name">NewsAPI</div>
-          <div class="count">-</div>
-        </div>
-        <div class="source-btn" data-source="newsdata" onclick="toggleSource('newsdata')">
-          <div class="checkmark">✓</div>
-          <div class="icon"><img src="assets/newsdata.png" alt="NewsData"></div>
-          <div class="name">NewsData</div>
-          <div class="count">-</div>
-        </div>
-        <div class="source-btn" data-source="perplexity" onclick="toggleSource('perplexity')">
-          <div class="checkmark">✓</div>
-          <div class="icon"><img src="assets/perplexity.png" alt="Perplexity"></div>
-          <div class="name">Perplexity</div>
-          <div class="count">-</div>
-        </div>
-        <div class="source-btn" data-source="grok" onclick="toggleSource('grok')">
-          <div class="checkmark">✓</div>
-          <div class="icon"><img src="logos/grok.png" alt="Grok"></div>
-          <div class="name">Grok</div>
-          <div class="count">-</div>
-        </div>
-      </div>
-
-      <button class="fetch-all-btn" onclick="fetchAllSources()">
-        FETCH ALL SOURCES
-      </button>
+      <div class="topic-fetching-indicator" id="topic-fetching-indicator">Fetching articles...</div>
 
     </div>
 
@@ -2206,7 +2018,7 @@
         </div>
       </div>
 
-      <div class="linkedin-share-container">
+      <div class="linkedin-share-container hidden" id="linkedin-share-container">
         <button class="linkedin-share-btn" onclick="shareOnLinkedIn()">
           Share on
           <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="vertical-align: middle; margin: 0 6px;">
@@ -2255,86 +2067,68 @@
       </div>
     </div>
 
-    <!-- Length Selection Modal -->
-    <div class="length-modal" id="length-modal">
-      <div class="length-modal-content">
-        <h2>Select Length</h2>
-        <p class="subtitle">How many slides do you want?</p>
-
-        <div class="length-options">
-          <div class="length-option" onclick="selectLengthAndGenerate('short')">
-            <div class="slides-count">4-5</div>
-            <div class="length-info">
-              <h3>Short</h3>
-              <p>Quick highlights, perfect for fast reads</p>
-            </div>
-          </div>
-
-          <div class="length-option" onclick="selectLengthAndGenerate('medium')">
-            <div class="slides-count">10-12</div>
-            <div class="length-info">
-              <h3>Medium</h3>
-              <p>Balanced coverage with key insights</p>
-            </div>
-          </div>
-
-          <div class="length-option" onclick="selectLengthAndGenerate('long')">
-            <div class="slides-count">18-20</div>
-            <div class="length-info">
-              <h3>Long</h3>
-              <p>Deep dive with full analysis</p>
-            </div>
-          </div>
-        </div>
-
-        <button class="cancel-btn" onclick="hideLengthModal()">Cancel</button>
-      </div>
-    </div>
-
     <!-- SCREEN: Card Generation -->
     <div id="screen-generating" class="screen" style="justify-content: center; align-items: center; padding: 20px; position: relative;">
       <button class="abort-btn" onclick="abortGeneration()" title="Cancel">✕</button>
-      <!-- AI Radar Logo -->
-      <div class="gamma-highlight">
-        <div class="gamma-logo-box">
-          <img src="assets/logo-white.png" alt="AI Radar">
+
+      <!-- PHASE 1: "Your slides are being created" -->
+      <div class="gen-phase-1" id="gen-phase-1">
+        <div class="gen-phase-1-logo">
+          <img src="assets/logo-white.png" alt="AI Radar" style="width: 80px; height: 80px; object-fit: contain;">
+        </div>
+        <h2 style="color: var(--gold); font-size: 22px; margin: 24px 0 8px; font-weight: 700;">Your slides are being created</h2>
+        <p class="gen-article-title" id="gen-article-title" style="color: var(--text-muted); font-size: 14px; text-align: center; max-width: 280px; line-height: 1.4;"></p>
+      </div>
+
+      <!-- PHASE 2: AI progress + audio (hidden initially) -->
+      <div class="gen-phase-2" id="gen-phase-2">
+        <!-- AI Logos -->
+        <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+          <div style="display: flex; flex-direction: column; align-items: center; opacity: 0.6;">
+            <img src="logos/chatgpt.png" alt="GPT" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; opacity: 0.6;">
+            <img src="logos/claude.png" alt="Claude" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; opacity: 0.6;">
+            <img src="logos/gemini.png" alt="Gemini" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; opacity: 0.6;">
+            <img src="logos/grok.png" alt="Grok" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #333;">
+          </div>
+        </div>
+
+        <!-- Step Card -->
+        <div class="generation-cards">
+          <div class="gen-card-single">
+            <div class="step-num" id="step-num">1</div>
+            <div class="step-total" id="step-total">of 12</div>
+          </div>
+        </div>
+
+        <!-- Step Description -->
+        <p class="gen-step-description" id="gen-step-description">Analyzing article content...</p>
+
+        <!-- Progress -->
+        <div style="width: 100%; max-width: 250px;">
+          <div class="generation-progress">
+            <div class="generation-progress-fill" id="gen-progress-fill"></div>
+          </div>
+          <p class="generation-percent" id="gen-percent">0%</p>
         </div>
       </div>
 
-      <!-- Status -->
-      <p id="generating-status" style="color: var(--text-muted); font-size: 12px; margin: 8px 0 4px;">Creating carousel...</p>
-      <p class="gen-article-title" id="gen-article-title"></p>
-
-      <!-- Single Card with Step Number -->
-      <div class="generation-cards">
-        <div class="gen-card-single">
-          <div class="step-num" id="step-num">1</div>
-          <div class="step-total" id="step-total">of 8</div>
-        </div>
-      </div>
-
-      <!-- Step Description -->
-      <p class="gen-step-description" id="gen-step-description">Analyzing article content...</p>
-
-      <!-- Audio Summary -->
+      <!-- Audio controls (visible in both phases) -->
       <div style="margin: 16px 0; display: flex; flex-direction: column; align-items: center; gap: 6px;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <button id="audio-btn" onclick="toggleAudioSummary()" style="background: var(--gold); border: none; padding: 10px 24px; border-radius: 24px; font-size: 14px; font-weight: 700; color: var(--bg-primary); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 2px 12px rgba(212,175,55,0.3);">
-            <span id="audio-icon">🎧</span> <span id="audio-text">Listen to Summary</span>
+          <button id="audio-btn" onclick="toggleAudioSummary()" disabled style="background: var(--gold); border: none; padding: 10px 24px; border-radius: 24px; font-size: 14px; font-weight: 700; color: var(--bg-primary); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 2px 12px rgba(212,175,55,0.3); opacity: 0.5;">
+            <span id="audio-icon">🎧</span> <span id="audio-text">Preparing Audio...</span>
           </button>
           <button id="audio-stop-btn" class="audio-stop-btn" onclick="stopAudio()" style="display: none;">⏹ Stop</button>
         </div>
         <span id="audio-status" style="font-size: 11px; color: var(--text-muted);"></span>
       </div>
       <audio id="summary-audio" style="display: none;"></audio>
-
-      <!-- Progress -->
-      <div style="width: 100%; max-width: 250px;">
-        <div class="generation-progress">
-          <div class="generation-progress-fill" id="gen-progress-fill"></div>
-        </div>
-        <p class="generation-percent" id="gen-percent">0%</p>
-      </div>
     </div>
 
     <!-- Loading Overlay -->
@@ -2391,25 +2185,26 @@
     ];
 
     // Audio summary - uses backend proxy for TTS
-    async function generateAudioSummary(article) {
+    let audioReadyButWaiting = false;
+
+    async function generateAudioSummaryPhased(article) {
       const statusEl = document.getElementById('audio-status');
       const btnEl = document.getElementById('audio-btn');
       const iconEl = document.getElementById('audio-icon');
       const textEl = document.getElementById('audio-text');
       const audioEl = document.getElementById('summary-audio');
 
-      if (!article) {
-        statusEl.textContent = 'No article selected';
-        return;
-      }
+      if (!article) return;
 
-      statusEl.textContent = 'Generating summary...';
-      btnEl.disabled = true;
+      // Reset state
+      cachedAudioUrl = null;
+      audioReadyButWaiting = false;
+      if (statusEl) statusEl.textContent = 'Generating audio...';
 
       try {
         const quote = inspiringQuotes[Math.floor(Math.random() * inspiringQuotes.length)];
-        const outro = ' ... This AI Radar summary was brought to you by JJ Shay. Check out jjshay.com for other projects and over 70 free AI reports to download.';
-        const fullSummary = (article.summary || article.description || '') + outro;
+        const outro = ' ... Visit jjshay.com for over 70 free AI reports. Stay informed, stay ahead.';
+        const fullSummary = (article.summary || article.description || '') + ' ... ' + quote + outro;
         const response = await fetch(`${API_BASE}/audio-summary`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2419,54 +2214,96 @@
             summary: fullSummary,
             quote: quote
           }),
-          signal: AbortSignal.timeout(15000)
+          signal: AbortSignal.timeout(20000)
         });
 
         if (!response.ok) throw new Error('Failed to generate audio');
 
-        statusEl.textContent = 'Loading audio...';
         const audioBlob = await response.blob();
         cachedAudioUrl = URL.createObjectURL(audioBlob);
-
         audioEl.src = cachedAudioUrl;
-        audioEl.play();
-        isAudioPlaying = true;
 
-        iconEl.textContent = '⏸️';
-        textEl.textContent = 'Pause';
-        statusEl.textContent = 'Playing...';
-        const stopBtn = document.getElementById('audio-stop-btn');
-        if (stopBtn) stopBtn.style.display = 'inline-block';
+        // Enable the play button
+        if (btnEl) {
+          btnEl.disabled = false;
+          btnEl.style.opacity = '1';
+        }
+        if (textEl) textEl.textContent = 'Listen to Summary';
+        if (statusEl) statusEl.textContent = 'Audio ready';
 
-        const fmtTime = (s) => {
-          const m = Math.floor(s / 60);
-          const sec = Math.floor(s % 60);
-          return `${m}:${sec < 10 ? '0' : ''}${sec}`;
-        };
-        audioEl.ontimeupdate = () => {
+        // Mark as ready - phase 2 transition will auto-play if it's already showing
+        audioReadyButWaiting = true;
+        autoPlayAudioIfReady();
+
+      } catch (error) {
+        console.error('Audio generation error:', error);
+        if (statusEl) statusEl.textContent = 'Audio unavailable';
+        if (btnEl) {
+          btnEl.disabled = true;
+          btnEl.style.opacity = '0.5';
+        }
+        if (textEl) textEl.textContent = 'Audio Unavailable';
+      }
+    }
+
+    function autoPlayAudioIfReady() {
+      if (!audioReadyButWaiting || !cachedAudioUrl) return;
+
+      const phase2 = document.getElementById('gen-phase-2');
+      if (!phase2 || !phase2.classList.contains('active')) return;
+
+      // Phase 2 is showing and audio is ready - try to auto-play
+      const audioEl = document.getElementById('summary-audio');
+      const iconEl = document.getElementById('audio-icon');
+      const textEl = document.getElementById('audio-text');
+      const statusEl = document.getElementById('audio-status');
+      const stopBtn = document.getElementById('audio-stop-btn');
+
+      audioReadyButWaiting = false;
+
+      const playPromise = audioEl.play();
+      if (playPromise) {
+        playPromise.then(() => {
+          isAudioPlaying = true;
+          if (iconEl) iconEl.textContent = '⏸️';
+          if (textEl) textEl.textContent = 'Pause';
+          if (statusEl) statusEl.textContent = 'Playing...';
+          if (stopBtn) stopBtn.style.display = 'inline-block';
+        }).catch(() => {
+          // Browser blocked autoplay - user must tap to play
+          console.log('Autoplay blocked, user must tap play button');
+          if (statusEl) statusEl.textContent = 'Tap to play';
+        });
+      }
+
+      const fmtTime = (s) => {
+        const m = Math.floor(s / 60);
+        const sec = Math.floor(s % 60);
+        return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+      };
+      audioEl.ontimeupdate = () => {
+        if (statusEl) {
           const elapsed = fmtTime(audioEl.currentTime);
           if (audioEl.duration && isFinite(audioEl.duration)) {
             statusEl.textContent = `${elapsed} / ${fmtTime(audioEl.duration)}`;
           } else {
             statusEl.textContent = `${elapsed} playing`;
           }
-        };
+        }
+      };
+      audioEl.onended = () => {
+        audioEl.ontimeupdate = null;
+        isAudioPlaying = false;
+        if (iconEl) iconEl.textContent = '🎧';
+        if (textEl) textEl.textContent = 'Replay';
+        if (statusEl) statusEl.textContent = '';
+        if (stopBtn) stopBtn.style.display = 'none';
+      };
+    }
 
-        audioEl.onended = () => {
-          audioEl.ontimeupdate = null;
-          isAudioPlaying = false;
-          iconEl.textContent = '🎧';
-          textEl.textContent = 'Replay';
-          statusEl.textContent = '';
-          if (stopBtn) stopBtn.style.display = 'none';
-        };
-
-      } catch (error) {
-        console.error('Audio generation error:', error);
-        statusEl.textContent = 'Audio unavailable';
-      }
-
-      btnEl.disabled = false;
+    // Legacy wrapper for toggleAudioSummary compatibility
+    async function generateAudioSummary(article) {
+      return generateAudioSummaryPhased(article);
     }
 
     function toggleAudioSummary() {
@@ -2527,8 +2364,30 @@
     let currentCardIndex = 0;
     let selectedArticle = null;
     let selectedLength = 'medium';
-    let selectedSources = new Set();
     let selectedTopic = 'artificial intelligence';
+
+    // ============================================
+    // INTRO SCREEN (first-visit only)
+    // ============================================
+    const INTRO_SEEN_KEY = 'ai-radar-intro-seen';
+
+    function checkAndShowIntro() {
+      if (!localStorage.getItem(INTRO_SEEN_KEY)) {
+        document.getElementById('screen-home').classList.remove('active');
+        showScreen('intro');
+      } else {
+        showScreen('home');
+      }
+    }
+
+    function startFromIntro() {
+      localStorage.setItem(INTRO_SEEN_KEY, 'true');
+      showScreen('home');
+    }
+
+    function showIntro() {
+      showScreen('intro');
+    }
 
     // Global topic keywords for learning and display
     const topicKeywords = ['AI', 'GPT', 'OpenAI', 'Google', 'Microsoft', 'Apple', 'Tesla', 'Crypto', 'Startup', 'Enterprise', 'Cloud', 'Data', 'Robot', 'Quantum', 'Meta', 'Amazon', 'ChatGPT', 'Gemini', 'Claude', 'Machine Learning', 'Deep Learning', 'Neural', 'Nvidia', 'Anthropic'];
@@ -2698,93 +2557,148 @@
     // ============================================
     // SOURCE SELECTION
     // ============================================
-    function toggleSource(source) {
-      const btn = document.querySelector(`.source-btn[data-source="${source}"]`);
-      if (selectedSources.has(source)) {
-        selectedSources.delete(source);
-        btn.classList.remove('selected');
-      } else {
-        selectedSources.add(source);
-        btn.classList.add('selected');
-      }
-      updateFetchButton();
-    }
-
-    function setTopic(topic) {
+    // ============================================
+    // INDUSTRY SELECT + AUTO-FETCH
+    // ============================================
+    async function onIndustrySelect(topic) {
+      if (!topic) return;
       selectedTopic = topic;
-    }
-
-    async function setTopicAndFetchCounts(topic) {
-      selectedTopic = topic;
-
-      // Clear previous articles and reset state for new topic
       articles = [];
       currentCardIndex = 0;
 
-      // Reset all source buttons
-      const sources = ['newsapi', 'newsdata', 'perplexity', 'grok'];
-      sources.forEach(source => {
-        const btn = document.querySelector(`.source-btn[data-source="${source}"]`);
-        if (btn) {
-          btn.classList.remove('done');
-          const countEl = btn.querySelector('.count');
-          if (countEl) countEl.textContent = '...';
-        }
-      });
+      // Show fetching indicator
+      const indicator = document.getElementById('topic-fetching-indicator');
+      if (indicator) indicator.classList.add('visible');
 
-      // Fetch counts for each source (simulated for demo)
-      for (const source of sources) {
-        await fetchSourceCount(source, topic);
-      }
+      // Brief visual pause then auto-fetch
+      await sleep(600);
+      await fetchAllSourcesAuto();
     }
 
-    async function fetchSourceCount(source, topic) {
-      const btn = document.querySelector(`.source-btn[data-source="${source}"]`);
+    async function fetchAllSourcesAuto() {
+      const allSources = ['newsapi', 'newsdata', 'perplexity', 'grok'];
+
+      // Fetch all 4 sources in parallel
+      const results = await Promise.allSettled(
+        allSources.map(source => fetchSource(source))
+      );
+
+      // Hide fetching indicator
+      const indicator = document.getElementById('topic-fetching-indicator');
+      if (indicator) indicator.classList.remove('visible');
+
+      console.log(`Fetched ${articles.length} articles from ${allSources.length} sources`);
+
+      // Show AI scoring animation screen
+      showScreen('scoring');
 
       try {
-        // Try real backend
-        const response = await fetch(`${API_BASE}/api/articles/count?source=${source}&topic=${encodeURIComponent(topic)}`, { signal: AbortSignal.timeout(8000) });
-        if (response.ok) {
-          const data = await response.json();
-          btn.querySelector('.count').textContent = data.count || 0;
-          return;
-        }
+        await runAIScoring();
       } catch (err) {
-        // Demo mode - generate random counts
+        console.error('Scoring error:', err);
       }
 
-      // Demo: random article counts
-      await sleep(200 + Math.random() * 300);
-      const count = Math.floor(Math.random() * 15) + 3;
-      btn.querySelector('.count').textContent = count;
-    }
+      const totalBefore = articles.length;
 
-    function updateFetchButton() {
-      const btn = document.querySelector('.fetch-all-btn');
-      const count = selectedSources.size;
-      if (count === 0) {
-        btn.textContent = 'FETCH ALL SOURCES';
-      } else {
-        btn.textContent = `FETCH ${count} SOURCE${count > 1 ? 'S' : ''}`;
+      // --- TRENDING: Tag articles whose title appears across multiple sources ---
+      try {
+        const normalize = (t) => (t || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+        for (const a of articles) {
+          const norm = normalize(a.title);
+          const words = norm.split(' ');
+          const sourcesFound = new Set();
+          sourcesFound.add(a.source);
+          for (const b of articles) {
+            if (b.id === a.id) continue;
+            const normB = normalize(b.title);
+            const wordsB = normB.split(' ');
+            const overlap = words.filter(w => wordsB.includes(w)).length;
+            if (overlap >= Math.min(words.length, wordsB.length) * 0.5) {
+              sourcesFound.add(b.source);
+            }
+          }
+          if (sourcesFound.size >= 2) {
+            if (!a.tags) a.tags = [];
+            if (!a.tags.includes('Trending')) a.tags.push('Trending');
+            a.sourceCount = sourcesFound.size;
+          }
+        }
+      } catch (e) { console.error('Trending tag error:', e); }
+
+      // --- DEDUP: Remove articles with very similar titles ---
+      try {
+        const normalize = (t) => (t || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+        const seen = [];
+        const deduped = [];
+        for (const a of articles) {
+          const norm = normalize(a.title);
+          const isDupe = seen.some(s => {
+            if (norm === s) return true;
+            const wordsA = norm.split(' ');
+            const wordsB = s.split(' ');
+            const overlap = wordsA.filter(w => wordsB.includes(w)).length;
+            return overlap >= Math.min(wordsA.length, wordsB.length) * 0.7;
+          });
+          if (!isDupe) {
+            seen.push(norm);
+            deduped.push(a);
+          }
+        }
+        const dupesRemoved = totalBefore - deduped.length;
+        if (dupesRemoved > 0) console.log(`Dedup: removed ${dupesRemoved} duplicate articles`);
+        articles = deduped;
+      } catch (e) { console.error('Dedup error:', e); }
+
+      // --- GAME CHANGER: Tag articles with high avg scores ---
+      try {
+        for (const a of articles) {
+          const avg = parseFloat(a.avgScore) || 0;
+          if (avg >= 88) {
+            if (!a.tags) a.tags = [];
+            if (!a.tags.includes('Game Changer')) a.tags.push('Game Changer');
+          }
+        }
+      } catch (e) { console.error('Game Changer tag error:', e); }
+
+      // --- FILTER: Remove articles under 100 words ---
+      try {
+        const beforeFilter = articles.length;
+        const filtered = articles.filter(a => (a.words || 0) >= 100);
+        if (beforeFilter - filtered.length > 0) console.log(`Filtered out ${beforeFilter - filtered.length} articles under 100 words`);
+        articles = filtered.length > 0 ? filtered : articles;
+      } catch (e) { console.error('Filter error:', e); }
+
+      // Sort articles by combined score (AI score + user preference learning)
+      try {
+        articles.sort((a, b) => {
+          const relevanceA = calculateRelevanceScore(a) || 0;
+          const relevanceB = calculateRelevanceScore(b) || 0;
+          const combinedA = (parseFloat(a.avgScore) || 0) + (relevanceA * 5);
+          const combinedB = (parseFloat(b.avgScore) || 0) + (relevanceB * 5);
+          return combinedB - combinedA;
+        });
+        console.log('Articles sorted by learning + AI scores');
+      } catch (sortErr) {
+        console.error('Sort error:', sortErr);
       }
+
+      // Show swipe screen
+      const filtered = totalBefore - articles.length;
+      console.log(`Transitioning to swipe screen with ${articles.length} articles (from ${totalBefore} raw, ${filtered} filtered)`);
+      window._filterInfo = filtered > 0 ? `(${filtered} filtered)` : '';
+      showScreen('swipe');
     }
 
-    // ============================================
     function goHome() {
       currentCardIndex = 0;
       articles = [];
       showScreen('home');
-      document.querySelectorAll('.source-btn').forEach(btn => {
-        btn.classList.remove('fetching', 'done');
-        btn.querySelector('.count').textContent = '0';
-      });
-      const fetchBtn = document.querySelector('.fetch-all-btn');
-      if (fetchBtn) {
-        fetchBtn.disabled = false;
-        fetchBtn.textContent = selectedSources.size > 0
-          ? `FETCH ${selectedSources.size} SOURCE${selectedSources.size > 1 ? 'S' : ''}`
-          : 'FETCH ALL SOURCES';
-      }
+      // Reset dropdown to blank placeholder
+      const dropdown = document.getElementById('topic-dropdown');
+      if (dropdown) dropdown.selectedIndex = 0;
+      // Hide fetching indicator
+      const indicator = document.getElementById('topic-fetching-indicator');
+      if (indicator) indicator.classList.remove('visible');
     }
 
     function abortGeneration() {
@@ -2824,7 +2738,7 @@
     // ============================================
     async function fetchSource(source) {
       const btn = document.querySelector(`.source-btn[data-source="${source}"]`);
-      btn.classList.add('fetching');
+      if (btn) btn.classList.add('fetching');
 
       // API calls through Vercel serverless routes (no CORS issues)
       try {
@@ -2943,9 +2857,11 @@
 
         if (directArticles.length > 0) {
           articles = [...articles, ...directArticles];
-          btn.classList.remove('fetching');
-          btn.classList.add('done');
-          btn.querySelector('.count').textContent = directArticles.length;
+          if (btn) {
+            btn.classList.remove('fetching');
+            btn.classList.add('done');
+            btn.querySelector('.count').textContent = directArticles.length;
+          }
           console.log(`Got ${directArticles.length} articles directly from ${source}`);
           return directArticles.length;
         }
@@ -2954,11 +2870,13 @@
       }
 
       // Fallback to demo data
-      btn.classList.remove('fetching');
+      if (btn) btn.classList.remove('fetching');
       const fakeArticles = generateFakeArticles(source, 5);
       articles = [...articles, ...fakeArticles];
-      btn.querySelector('.count').textContent = fakeArticles.length;
-      btn.classList.add('done');
+      if (btn) {
+        btn.querySelector('.count').textContent = fakeArticles.length;
+        btn.classList.add('done');
+      }
 
       return fakeArticles.length;
     }
@@ -2972,124 +2890,6 @@
       if (diffDays === 1) return 'Yesterday';
       if (diffDays < 7) return `${diffDays} days ago`;
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
-
-    async function fetchAllSources() {
-      const btn = document.querySelector('.fetch-all-btn');
-      btn.disabled = true;
-      btn.textContent = 'FETCHING...';
-
-      const allSources = ['newsapi', 'newsdata', 'perplexity', 'grok'];
-      const sources = selectedSources.size > 0 ? Array.from(selectedSources) : allSources;
-
-      for (const source of sources) {
-        await fetchSource(source);
-        await sleep(300);
-      }
-
-      btn.textContent = `${articles.length} ARTICLES READY`;
-
-      // Brief pause then show scoring
-      await sleep(500);
-
-      // Show AI scoring animation screen
-      showScreen('scoring');
-
-      try {
-        await runAIScoring();
-      } catch (err) {
-        console.error('Scoring error:', err);
-      }
-
-      const totalBefore = articles.length;
-
-      // --- TRENDING: Tag articles whose title appears across multiple sources ---
-      try {
-        const normalize = (t) => (t || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
-        for (const a of articles) {
-          const norm = normalize(a.title);
-          const words = norm.split(' ');
-          const sourcesFound = new Set();
-          sourcesFound.add(a.source);
-          for (const b of articles) {
-            if (b.id === a.id) continue;
-            const normB = normalize(b.title);
-            const wordsB = normB.split(' ');
-            const overlap = words.filter(w => wordsB.includes(w)).length;
-            if (overlap >= Math.min(words.length, wordsB.length) * 0.5) {
-              sourcesFound.add(b.source);
-            }
-          }
-          if (sourcesFound.size >= 2) {
-            if (!a.tags) a.tags = [];
-            if (!a.tags.includes('Trending')) a.tags.push('Trending');
-            a.sourceCount = sourcesFound.size;
-          }
-        }
-      } catch (e) { console.error('Trending tag error:', e); }
-
-      // --- DEDUP: Remove articles with very similar titles ---
-      try {
-        const normalize = (t) => (t || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
-        const seen = [];
-        const deduped = [];
-        for (const a of articles) {
-          const norm = normalize(a.title);
-          const isDupe = seen.some(s => {
-            if (norm === s) return true;
-            const wordsA = norm.split(' ');
-            const wordsB = s.split(' ');
-            const overlap = wordsA.filter(w => wordsB.includes(w)).length;
-            return overlap >= Math.min(wordsA.length, wordsB.length) * 0.7;
-          });
-          if (!isDupe) {
-            seen.push(norm);
-            deduped.push(a);
-          }
-        }
-        const dupesRemoved = totalBefore - deduped.length;
-        if (dupesRemoved > 0) console.log(`Dedup: removed ${dupesRemoved} duplicate articles`);
-        articles = deduped;
-      } catch (e) { console.error('Dedup error:', e); }
-
-      // --- GAME CHANGER: Tag articles with high avg scores ---
-      try {
-        for (const a of articles) {
-          const avg = parseFloat(a.avgScore) || 0;
-          if (avg >= 88) {
-            if (!a.tags) a.tags = [];
-            if (!a.tags.includes('Game Changer')) a.tags.push('Game Changer');
-          }
-        }
-      } catch (e) { console.error('Game Changer tag error:', e); }
-
-      // --- FILTER: Remove articles under 100 words ---
-      try {
-        const beforeFilter = articles.length;
-        const filtered = articles.filter(a => (a.words || 0) >= 100);
-        if (beforeFilter - filtered.length > 0) console.log(`Filtered out ${beforeFilter - filtered.length} articles under 100 words`);
-        articles = filtered.length > 0 ? filtered : articles;
-      } catch (e) { console.error('Filter error:', e); }
-
-      // Sort articles by combined score (AI score + user preference learning)
-      try {
-        articles.sort((a, b) => {
-          const relevanceA = calculateRelevanceScore(a) || 0;
-          const relevanceB = calculateRelevanceScore(b) || 0;
-          const combinedA = (parseFloat(a.avgScore) || 0) + (relevanceA * 5);
-          const combinedB = (parseFloat(b.avgScore) || 0) + (relevanceB * 5);
-          return combinedB - combinedA;
-        });
-        console.log('Articles sorted by learning + AI scores');
-      } catch (sortErr) {
-        console.error('Sort error:', sortErr);
-      }
-
-      // Show swipe screen
-      const filtered = totalBefore - articles.length;
-      console.log(`Transitioning to swipe screen with ${articles.length} articles (from ${totalBefore} raw, ${filtered} filtered)`);
-      window._filterInfo = filtered > 0 ? `(${filtered} filtered)` : '';
-      showScreen('swipe');
     }
 
     function clampScore(val) {
@@ -3722,13 +3522,17 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
       let exitX = 0, exitY = 0;
       switch(direction) {
         case 'right':
-          // CREATE - Show length selection modal & record positive feedback
+          // CREATE - Auto-generate slides (always medium) & record positive feedback
           selectedArticle = article;
           recordInterested(article);
-          showLengthModal();
-          // Reset card position
-          card.style.transform = '';
-          return; // Don't animate out
+          // Animate card upward then start generation
+          card.style.transition = 'transform 0.3s ease';
+          card.style.transform = `translateY(-${window.innerHeight}px)`;
+          setTimeout(() => {
+            currentCardIndex++;
+            startCardGeneration('medium');
+          }, 300);
+          return; // Don't animate out normally
         case 'left':
           exitX = -window.innerWidth;
           showToast('Skipped');
@@ -3829,13 +3633,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
     // ============================================
     // LENGTH MODAL
     // ============================================
-    function showLengthModal() {
-      document.getElementById('length-modal').classList.add('show');
-    }
 
-    function hideLengthModal() {
-      document.getElementById('length-modal').classList.remove('show');
-    }
 
     // Gamma Template IDs for different presentation lengths
     const GAMMA_TEMPLATES = {
@@ -3918,51 +3716,57 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
     let currentJobId = null;
     let generationPollInterval = null;
 
-    function selectLengthAndGenerate(length) {
-      selectedLength = length;
-      hideLengthModal();
-
-      // Animate out the current card
-      const card = document.querySelector('.swipe-card');
-      if (card) {
-        card.style.transition = 'transform 0.3s ease';
-        card.style.transform = `translateY(-${window.innerHeight}px)`;
-      }
-
-      setTimeout(() => {
-        currentCardIndex++;
-        startCardGeneration(length);
-      }, 300);
-    }
-
     async function startCardGeneration(length) {
       const config = CARD_CONFIGS[length];
       console.log('Starting generation with config:', length, config);
 
-      // Show generating screen
+      // Reset phases and show generating screen
+      resetGeneratingPhases();
       showScreen('generating');
 
-      // Lazy load audio summary after a few seconds
-      setTimeout(() => {
-        if (selectedArticle && !isAudioPlaying) {
-          console.log('Lazy loading audio summary...');
-          document.getElementById('audio-status').textContent = 'Preparing audio...';
-          generateAudioSummary(selectedArticle);
-        }
-      }, 3000);
+      // Set article title in phase 1
+      const titleEl = document.getElementById('gen-article-title');
+      if (titleEl) titleEl.textContent = selectedArticle?.title || '';
 
-      // Set up single card display
-      document.getElementById('step-num').textContent = '1';
-      document.getElementById('step-total').textContent = `of ${config.count}`;
-      document.getElementById('gen-step-description').textContent = config.steps[0]?.step || 'Starting...';
-      document.getElementById('generating-status').textContent = 'Creating carousel...';
-      document.getElementById('gen-article-title').textContent = selectedArticle?.title || '';
+      // Fire TTS audio generation immediately (don't await)
+      if (selectedArticle) {
+        generateAudioSummaryPhased(selectedArticle);
+      }
+
+      // Fire backend generation (don't await)
+      const backendPromise = triggerBackendGeneration(length);
+
+      // After 10 seconds, transition to phase 2
+      setTimeout(() => {
+        transitionToPhase2(config.count, backendPromise);
+      }, 10000);
+    }
+
+    function resetGeneratingPhases() {
+      const phase1 = document.getElementById('gen-phase-1');
+      const phase2 = document.getElementById('gen-phase-2');
+      if (phase1) phase1.style.display = 'flex';
+      if (phase2) phase2.classList.remove('active');
 
       // Reset progress
-      document.getElementById('gen-progress-fill').style.width = '0%';
-      document.getElementById('gen-percent').textContent = '0%';
+      const fill = document.getElementById('gen-progress-fill');
+      const pct = document.getElementById('gen-percent');
+      if (fill) fill.style.width = '0%';
+      if (pct) pct.textContent = '0%';
 
-      // Try to call real backend first
+      // Reset audio button to disabled
+      const audioBtn = document.getElementById('audio-btn');
+      if (audioBtn) {
+        audioBtn.disabled = true;
+        audioBtn.style.opacity = '0.5';
+      }
+      const audioText = document.getElementById('audio-text');
+      if (audioText) audioText.textContent = 'Preparing Audio...';
+      const audioIcon = document.getElementById('audio-icon');
+      if (audioIcon) audioIcon.textContent = '🎧';
+    }
+
+    async function triggerBackendGeneration(length) {
       try {
         console.log('Calling backend to generate slides (preview mode)...');
         const response = await fetch(`${API_BASE}/generate-from-newsout`, {
@@ -3974,7 +3778,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
             source: selectedArticle.source || '',
             link: selectedArticle.link || selectedArticle.url || '',
             avg_score: selectedArticle.avg_score || 85,
-            preview_only: true  // Generate but don't post - let user review first
+            preview_only: true
           }),
           signal: AbortSignal.timeout(15000)
         });
@@ -3983,17 +3787,38 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
           const data = await response.json();
           currentJobId = data.job_id;
           console.log('Backend job started:', currentJobId);
-          document.getElementById('generating-status').textContent = 'Generating with Gamma AI...';
-          startGenerationPolling(config.count);
-          return;
+          return { success: true, jobId: data.job_id };
         }
       } catch (err) {
-        console.log('Backend not available, using simulation:', err);
+        console.log('Backend not available, will use simulation:', err);
       }
+      return { success: false };
+    }
 
-      // Fallback to simulation if backend unavailable
-      console.log('Running simulation with', config.count, 'cards');
-      runGenerationSimulation(config.count);
+    function transitionToPhase2(cardCount, backendPromise) {
+      // Hide phase 1, show phase 2
+      const phase1 = document.getElementById('gen-phase-1');
+      const phase2 = document.getElementById('gen-phase-2');
+      if (phase1) phase1.style.display = 'none';
+      if (phase2) phase2.classList.add('active');
+
+      // Auto-play audio if ready
+      autoPlayAudioIfReady();
+
+      // Set up step card
+      const config = CARD_CONFIGS[Object.keys(CARD_CONFIGS).find(k => CARD_CONFIGS[k].count === cardCount)] || CARD_CONFIGS.medium;
+      document.getElementById('step-num').textContent = '1';
+      document.getElementById('step-total').textContent = `of ${cardCount}`;
+      document.getElementById('gen-step-description').textContent = config.steps[0]?.step || 'Starting...';
+
+      // Check if backend started successfully
+      backendPromise.then(result => {
+        if (result.success) {
+          startGenerationPolling(cardCount);
+        } else {
+          runGenerationSimulation(cardCount);
+        }
+      });
     }
 
     function startGenerationPolling(cardCount) {
@@ -4087,7 +3912,6 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
 
     function runGenerationSimulation(cardCount) {
       console.log('Simulation starting for', cardCount, 'cards');
-      let percent = 0;
       let lastStep = 0;
 
       // Find config by count
@@ -4097,16 +3921,31 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
 
       console.log('Using config:', config);
 
-      // Simulate progress - slower to let audio summary play
+      // Smooth easing curve over ~35 seconds: fast to 75%, slow to 95%, then complete
+      const TOTAL_DURATION = 35000;
+      const startTime = Date.now();
+
       const interval = setInterval(() => {
-        percent += Math.random() * 4 + 2; // Random progress 2-6% (slower)
-        if (percent > 100) percent = 100;
+        const elapsed = Date.now() - startTime;
+        const t = Math.min(elapsed / TOTAL_DURATION, 1);
+
+        // Easing: fast start, slow middle, quick finish
+        // 0-0.6t → 0-75%, 0.6-0.9t → 75-95%, 0.9-1.0t → 95-100%
+        let percent;
+        if (t < 0.6) {
+          percent = (t / 0.6) * 75;
+        } else if (t < 0.9) {
+          percent = 75 + ((t - 0.6) / 0.3) * 20;
+        } else {
+          percent = 95 + ((t - 0.9) / 0.1) * 5;
+        }
+        percent = Math.min(Math.round(percent), 100);
 
         // Update progress bar
         const progressFill = document.getElementById('gen-progress-fill');
         const percentText = document.getElementById('gen-percent');
-        if (progressFill) progressFill.style.width = `${Math.round(percent)}%`;
-        if (percentText) percentText.textContent = `${Math.round(percent)}%`;
+        if (progressFill) progressFill.style.width = `${percent}%`;
+        if (percentText) percentText.textContent = `${percent}%`;
 
         // Update single card step
         const currentStep = Math.min(Math.floor((percent / 100) * cardCount) + 1, cardCount);
@@ -4127,7 +3966,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
             showResultsScreen({ status: 'complete' });
           }, 500);
         }
-      }, 500); // Slower - gives time for audio
+      }, 500);
     }
 
     // ============================================
@@ -4204,7 +4043,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
       const article = savedForLater.find(f => f.id === id);
       if (article) {
         selectedArticle = article;
-        showLengthModal();
+        startCardGeneration('medium');
       }
     }
 
@@ -4497,6 +4336,19 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
 
       showScreen('results');
       initFlipbook();
+
+      // Hide LinkedIn button initially, reveal after slides confirmed
+      const linkedinContainer = document.getElementById('linkedin-share-container');
+      if (linkedinContainer) {
+        linkedinContainer.classList.add('hidden');
+        linkedinContainer.classList.remove('reveal');
+        // Reveal after delay (500ms for real Gamma, 2s for simulation)
+        const delay = gammaUrl ? 500 : 2000;
+        setTimeout(() => {
+          linkedinContainer.classList.remove('hidden');
+          linkedinContainer.classList.add('reveal');
+        }, delay);
+      }
     }
 
     function showSuccessModal(gammaUrl = '') {
@@ -4513,11 +4365,38 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
 
     function shareOnLinkedIn() {
       const gammaLink = document.getElementById('gamma-link');
-      const shareUrl = gammaLink && gammaLink.href && gammaLink.href !== '#'
+      const gammaUrl = gammaLink && gammaLink.href && gammaLink.href !== '#'
         ? gammaLink.href
-        : (selectedArticle?.url || window.location.href);
-      const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
-      window.open(linkedinShareUrl, '_blank');
+        : '';
+
+      const title = selectedArticle?.title || 'AI Insights';
+      const summary = (selectedArticle?.summary || selectedArticle?.description || '').slice(0, 200);
+
+      // Build topic hashtag from selectedTopic
+      const topicTag = selectedTopic
+        .split(/\s+/)
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join('');
+
+      let postText = `📊 ${title}\n\n${summary}`;
+      if (gammaUrl) postText += `\n\n🔗 View the full presentation: ${gammaUrl}`;
+      postText += `\n\nCreated with AI Radar by JJ Shay | jjshay.com`;
+      postText += `\n#AI #${topicTag} #Leadership`;
+
+      const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(postText)}`;
+      window.open(linkedinUrl, '_blank');
+
+      // Show "Posted to LinkedIn!" toast when user returns
+      const handleReturn = () => {
+        showToast('Posted to LinkedIn!');
+        document.removeEventListener('visibilitychange', onVisChange);
+        window.removeEventListener('focus', handleReturn);
+      };
+      const onVisChange = () => {
+        if (document.visibilityState === 'visible') handleReturn();
+      };
+      document.addEventListener('visibilitychange', onVisChange);
+      window.addEventListener('focus', handleReturn);
     }
 
     function skipAndNext() {
@@ -4539,8 +4418,8 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
     // ============================================
     updateSavedCount();
 
-    // Auto-fetch counts for default topic on load
-    setTopicAndFetchCounts(selectedTopic);
+    // Show intro on first visit, otherwise go to home
+    checkAndShowIntro();
   </script>
 </body>
 </html>

@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const API_KEY = process.env.NEWSAPI_KEY;
+  const API_KEY = (process.env.NEWSAPI_KEY || '').trim();
   if (!API_KEY) {
     return res.status(500).json({ error: 'NewsAPI key not configured' });
   }

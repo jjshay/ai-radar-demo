@@ -2790,86 +2790,94 @@
     }
 
     async function fetchPerplexityBreaking() {
-      const today = new Date().toISOString().split('T')[0];
-      const resp = await fetch('/api/perplexity', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'sonar',
-          messages: [
-            { role: 'system', content: 'You are a news research assistant. Return ONLY valid JSON arrays. Every URL must be a real, verifiable article link.' },
-            { role: 'user', content: `Find 15 breaking news articles from the past 7 days (today is ${today}) about "${selectedTopic}". Focus on the most impactful, widely-reported stories with real facts and figures. Return as a JSON array: [{"title":"...","summary":"...","url":"https://...","publishedAt":"YYYY-MM-DD","imageUrl":"..."}]` }
-          ]
-        }),
-        signal: AbortSignal.timeout(15000)
-      });
-      const data = await resp.json();
-      const parsed = parsePerplexityResponse(data);
-      parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
-      articles = [...articles, ...parsed];
-      console.log(`Perplexity-breaking: ${parsed.length} articles`);
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const resp = await fetch('/api/perplexity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'sonar',
+            messages: [
+              { role: 'system', content: 'You are a news research assistant. Return ONLY valid JSON arrays. Every URL must be a real, verifiable article link.' },
+              { role: 'user', content: `Find 15 breaking news articles from the past 7 days (today is ${today}) about "${selectedTopic}". Focus on the most impactful, widely-reported stories with real facts and figures. Return as a JSON array: [{"title":"...","summary":"...","url":"https://...","publishedAt":"YYYY-MM-DD","imageUrl":"..."}]` }
+            ]
+          }),
+          signal: AbortSignal.timeout(15000)
+        });
+        const data = await resp.json();
+        const parsed = parsePerplexityResponse(data);
+        parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
+        articles = [...articles, ...parsed];
+        console.log(`Perplexity-breaking: ${parsed.length} articles`);
+      } catch (e) { console.error('Perplexity-breaking error:', e.message || e); }
     }
 
     async function fetchPerplexityAnalysis() {
-      const resp = await fetch('/api/perplexity', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'sonar',
-          messages: [
-            { role: 'system', content: 'You are an industry research analyst. Return ONLY valid JSON arrays. Every URL must be a real, verifiable article link.' },
-            { role: 'user', content: `Find 15 in-depth industry analysis articles, research reports, and expert opinion pieces from the past 30 days about "${selectedTopic}". Focus on strategic insights, market data, and expert commentary - NOT breaking news. Return as a JSON array: [{"title":"...","summary":"...","url":"https://...","publishedAt":"YYYY-MM-DD","imageUrl":"..."}]` }
-          ]
-        }),
-        signal: AbortSignal.timeout(15000)
-      });
-      const data = await resp.json();
-      const parsed = parsePerplexityResponse(data);
-      parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
-      articles = [...articles, ...parsed];
-      console.log(`Perplexity-analysis: ${parsed.length} articles`);
+      try {
+        const resp = await fetch('/api/perplexity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'sonar',
+            messages: [
+              { role: 'system', content: 'You are an industry research analyst. Return ONLY valid JSON arrays. Every URL must be a real, verifiable article link.' },
+              { role: 'user', content: `Find 15 in-depth industry analysis articles, research reports, and expert opinion pieces from the past 30 days about "${selectedTopic}". Focus on strategic insights, market data, and expert commentary - NOT breaking news. Return as a JSON array: [{"title":"...","summary":"...","url":"https://...","publishedAt":"YYYY-MM-DD","imageUrl":"..."}]` }
+            ]
+          }),
+          signal: AbortSignal.timeout(15000)
+        });
+        const data = await resp.json();
+        const parsed = parsePerplexityResponse(data);
+        parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
+        articles = [...articles, ...parsed];
+        console.log(`Perplexity-analysis: ${parsed.length} articles`);
+      } catch (e) { console.error('Perplexity-analysis error:', e.message || e); }
     }
 
     async function fetchGrokAnalysis() {
-      const resp = await fetch('/api/grok', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'grok-3-mini',
-          messages: [
-            { role: 'system', content: 'You are an industry analyst. Return ONLY valid JSON arrays. Focus on analysis and expert opinions. Do NOT fabricate URLs - use "#" for the url field.' },
-            { role: 'user', content: `List 15 important developments, expert analyses, or emerging trends in "${selectedTopic}" that professionals should know about. Focus on specific companies, deals, technologies, or policy changes. For each, write a detailed 4-5 sentence analytical summary. Return as a JSON array: [{"title":"...","summary":"...","url":"#","publishedAt":"YYYY-MM-DD"}]` }
-          ],
-          temperature: 0.7
-        }),
-        signal: AbortSignal.timeout(15000)
-      });
-      const data = await resp.json();
-      const parsed = parseGrokResponse(data);
-      parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
-      articles = [...articles, ...parsed];
-      console.log(`Grok-analysis: ${parsed.length} articles`);
+      try {
+        const resp = await fetch('/api/grok', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'grok-3-mini',
+            messages: [
+              { role: 'system', content: 'You are an industry analyst. Return ONLY valid JSON arrays. Focus on analysis and expert opinions. Do NOT fabricate URLs - use "#" for the url field.' },
+              { role: 'user', content: `List 15 important developments, expert analyses, or emerging trends in "${selectedTopic}" that professionals should know about. Focus on specific companies, deals, technologies, or policy changes. For each, write a detailed 4-5 sentence analytical summary. Return as a JSON array: [{"title":"...","summary":"...","url":"#","publishedAt":"YYYY-MM-DD"}]` }
+            ],
+            temperature: 0.7
+          }),
+          signal: AbortSignal.timeout(15000)
+        });
+        const data = await resp.json();
+        const parsed = parseGrokResponse(data);
+        parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
+        articles = [...articles, ...parsed];
+        console.log(`Grok-analysis: ${parsed.length} articles`);
+      } catch (e) { console.error('Grok-analysis error:', e.message || e); }
     }
 
     async function fetchGrokPredictions() {
-      const resp = await fetch('/api/grok', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'grok-3-mini',
-          messages: [
-            { role: 'system', content: 'You are a forward-looking technology strategist. Return ONLY valid JSON arrays. Do NOT fabricate URLs - use "#" for the url field.' },
-            { role: 'user', content: `List 15 bold predictions, contrarian perspectives, and emerging opportunities in "${selectedTopic}" for the next 6-12 months. Include specific company moves, funding rounds, regulatory shifts, and technology breakthroughs that most people are missing. For each, write a 4-5 sentence summary explaining the thesis. Return as a JSON array: [{"title":"...","summary":"...","url":"#","publishedAt":"YYYY-MM-DD"}]` }
-          ],
-          temperature: 0.9
-        }),
-        signal: AbortSignal.timeout(15000)
-      });
-      const data = await resp.json();
-      const parsed = parseGrokResponse(data);
-      parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
-      articles = [...articles, ...parsed];
-      console.log(`Grok-predictions: ${parsed.length} articles`);
+      try {
+        const resp = await fetch('/api/grok', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'grok-3-mini',
+            messages: [
+              { role: 'system', content: 'You are a forward-looking technology strategist. Return ONLY valid JSON arrays. Do NOT fabricate URLs - use "#" for the url field.' },
+              { role: 'user', content: `List 15 bold predictions, contrarian perspectives, and emerging opportunities in "${selectedTopic}" for the next 6-12 months. Include specific company moves, funding rounds, regulatory shifts, and technology breakthroughs that most people are missing. For each, write a 4-5 sentence summary explaining the thesis. Return as a JSON array: [{"title":"...","summary":"...","url":"#","publishedAt":"YYYY-MM-DD"}]` }
+            ],
+            temperature: 0.9
+          }),
+          signal: AbortSignal.timeout(15000)
+        });
+        const data = await resp.json();
+        const parsed = parseGrokResponse(data);
+        parsed.forEach(a => { if (!a.image) a.image = getTopicImage(selectedTopic); });
+        articles = [...articles, ...parsed];
+        console.log(`Grok-predictions: ${parsed.length} articles`);
+      } catch (e) { console.error('Grok-predictions error:', e.message || e); }
     }
 
     // ============================================

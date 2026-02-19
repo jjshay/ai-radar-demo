@@ -2428,10 +2428,10 @@
 
       <div class="card-stack" id="card-stack">
         <!-- Cards inserted dynamically -->
-        <div class="swipe-indicator left">⏭️</div>
-        <div class="swipe-indicator right">🎨</div>
-        <div class="swipe-indicator up">🚫</div>
-        <div class="swipe-indicator down">⏭</div>
+        <div class="swipe-indicator left">SKIP</div>
+        <div class="swipe-indicator right">CREATE</div>
+        <div class="swipe-indicator up">HOME</div>
+        <div class="swipe-indicator down">BACK</div>
       </div>
 
       <div class="swipe-hints">
@@ -2448,112 +2448,6 @@
           <div class="arrow">CREATE →</div>
         </div>
       </div>
-    </div>
-
-    <!-- SCREEN 3: ARTICLE DETAIL -->
-    <div id="screen-detail" class="screen">
-      <div class="detail-header">
-        <button class="back-btn" onclick="showScreen('swipe')">← Back</button>
-      </div>
-
-      <div class="detail-content">
-        <div class="detail-image" id="detail-image"></div>
-        <div class="detail-body">
-          <div class="detail-source" id="detail-source">TechCrunch</div>
-          <h1 class="detail-title" id="detail-title">Article Title</h1>
-          <p class="detail-summary" id="detail-summary">Article summary goes here...</p>
-
-          <div class="detail-scores">
-          <h3>AI Consensus Scores</h3>
-          <div class="score-grid">
-            <div class="score-item gpt">
-              <div class="value" id="score-gpt">-</div>
-              <div class="label">GPT</div>
-            </div>
-            <div class="score-item claude">
-              <div class="value" id="score-claude">-</div>
-              <div class="label">Claude</div>
-            </div>
-            <div class="score-item gemini">
-              <div class="value" id="score-gemini">-</div>
-              <div class="label">Gemini</div>
-            </div>
-            <div class="score-item grok">
-              <div class="value" id="score-grok">-</div>
-              <div class="label">Grok</div>
-            </div>
-            <div class="score-item pplx">
-              <div class="value" id="score-pplx">-</div>
-              <div class="label">Perplexity</div>
-            </div>
-          </div>
-        </div>
-        </div>
-      </div>
-
-      <div class="length-selector">
-        <h3>Select Slide Length</h3>
-        <div class="length-options">
-          <div class="length-btn" data-length="short" onclick="selectLength('short')">
-            <div class="slides">5</div>
-            <div class="label">Short</div>
-          </div>
-          <div class="length-btn selected" data-length="medium" onclick="selectLength('medium')">
-            <div class="slides">8</div>
-            <div class="label">Medium</div>
-          </div>
-          <div class="length-btn" data-length="long" onclick="selectLength('long')">
-            <div class="slides">12</div>
-            <div class="label">Long</div>
-          </div>
-        </div>
-        <button class="generate-btn" onclick="startPipeline()">
-          GENERATE & POST
-        </button>
-      </div>
-    </div>
-
-    <!-- SCREEN 4: PIPELINE -->
-    <div id="screen-pipeline" class="screen">
-      <div class="pipeline-progress" id="pipeline-progress">
-        <h1 class="pipeline-title">Generating...</h1>
-        <p class="pipeline-subtitle">Creating your Gamma presentation</p>
-
-        <div class="progress-container">
-          <svg class="progress-ring" width="200" height="200">
-            <circle class="progress-ring-bg" cx="100" cy="100" r="90"/>
-            <circle class="progress-ring-fill" id="progress-fill" cx="100" cy="100" r="90"/>
-          </svg>
-          <div class="progress-percent" id="progress-percent">0%</div>
-        </div>
-
-        <p class="progress-message" id="progress-message">Initializing...</p>
-
-        <div class="pipeline-steps">
-          <div class="pipeline-step" id="step-analyze">
-            <div class="step-icon">📝</div>
-            <div class="step-label">Analyzing article</div>
-          </div>
-          <div class="pipeline-step" id="step-slides">
-            <div class="step-icon">🎨</div>
-            <div class="step-label">Creating slides</div>
-          </div>
-          <div class="pipeline-step" id="step-review">
-            <div class="step-icon">🤖</div>
-            <div class="step-label">AI review</div>
-          </div>
-          <div class="pipeline-step" id="step-post">
-            <div class="step-icon">✅</div>
-            <div class="step-label">Finalizing</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="pipeline-success" id="pipeline-success">
-        <div class="success-icon">✓</div>
-        <h2>Complete!</h2>
-      </div>
-
     </div>
 
     <!-- SCREEN 5: RESULTS (Human in the Loop) -->
@@ -2811,8 +2705,11 @@
     const API_BASE = window.location.hostname === 'localhost'
       ? 'http://localhost:5050'
       : PRODUCTION_API;
-    // Use CORS proxy for browser access (needed for API calls from deployed site)
-    const CORS_PROXY = 'https://corsproxy.io/?';
+    // HTML escaping for XSS prevention
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
 
     // Audio summary state
     let isAudioPlaying = false;
@@ -2860,7 +2757,8 @@
             source: article.source || '',
             summary: fullSummary,
             quote: quote
-          })
+          }),
+          signal: AbortSignal.timeout(15000)
         });
 
         if (!response.ok) throw new Error('Failed to generate audio');
@@ -2978,7 +2876,6 @@
     // LEARNING SYSTEM - Track user preferences
     // ============================================
     // Google Sheets Feedback Storage
-    const FEEDBACK_SHEET_GID = '5770604';
     const FEEDBACK_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCfVoFCmq4jTZrXn6mJ75hWemq99IeiHgtxqbFZ2RLx28VNCkAgZy_Rgv_jERe_vfX/exec';
 
     let userFeedback = JSON.parse(localStorage.getItem('ai-radar-feedback') || '{"dislikedTopics":{},"dislikedSources":{},"dislikedKeywords":{},"likedTopics":{},"likedSources":{}}');
@@ -3185,7 +3082,7 @@
 
       try {
         // Try real backend
-        const response = await fetch(`${API_BASE}/api/articles/count?source=${source}&topic=${encodeURIComponent(topic)}`);
+        const response = await fetch(`${API_BASE}/api/articles/count?source=${source}&topic=${encodeURIComponent(topic)}`, { signal: AbortSignal.timeout(8000) });
         if (response.ok) {
           const data = await response.json();
           btn.querySelector('.count').textContent = data.count || 0;
@@ -3273,7 +3170,7 @@
         let directArticles = [];
 
         if (source === 'newsapi') {
-          const resp = await fetch(`/api/newsapi?q=${encodeURIComponent(selectedTopic)}&pageSize=12`);
+          const resp = await fetch(`/api/newsapi?q=${encodeURIComponent(selectedTopic)}&pageSize=12`, { signal: AbortSignal.timeout(10000) });
           const data = await resp.json();
           if (data.articles) {
             directArticles = data.articles.map(a => {
@@ -3292,7 +3189,7 @@
             });
           }
         } else if (source === 'newsdata') {
-          const resp = await fetch(`/api/newsdata?q=${encodeURIComponent(selectedTopic)}&language=en`);
+          const resp = await fetch(`/api/newsdata?q=${encodeURIComponent(selectedTopic)}&language=en`, { signal: AbortSignal.timeout(10000) });
           const data = await resp.json();
           // Handle both data.results (v1) and data.data (v2) API formats
           const results = (data.results && Array.isArray(data.results)) ? data.results
@@ -3324,7 +3221,8 @@
                 role: 'user',
                 content: `List 10 recent news headlines about ${selectedTopic}. For each, provide a detailed 3-4 sentence summary. JSON array: [{"title":"...","summary":"...","url":"...","publishedAt":"..."}]`
               }]
-            })
+            }),
+            signal: AbortSignal.timeout(15000)
           });
           const data = await resp.json();
           if (data.choices?.[0]?.message?.content) {
@@ -3355,7 +3253,8 @@
                 role: 'user',
                 content: `List 10 recent news headlines about ${selectedTopic}. For each, provide a detailed 3-4 sentence summary. JSON array: [{"title":"...","summary":"...","url":"...","publishedAt":"..."}]`
               }]
-            })
+            }),
+            signal: AbortSignal.timeout(15000)
           });
           const data = await resp.json();
           if (data.choices?.[0]?.message?.content) {
@@ -3604,7 +3503,8 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
               model: 'grok-3-mini',
               messages: [{ role: 'user', content: prompt }],
               temperature: 0.3
-            })
+            }),
+            signal: AbortSignal.timeout(20000)
           });
 
           const data = await resp.json();
@@ -3670,7 +3570,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
         statusEl.textContent = 'Complete! Ranking by AI scores...';
         console.log('AI scoring complete (real)', allResults.length, 'results');
       } else {
-        // Fallback: random scores
+        // Fallback: random scores (marked as estimates)
         console.log('AI scoring failed, using fallback');
         articles.forEach(a => {
           if (!a.scores) {
@@ -3681,6 +3581,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
               grok: Math.floor(Math.random() * 25) + 70,
               pplx: Math.floor(Math.random() * 25) + 70
             };
+            a.estimatedScores = true;
           }
           const s = a.scores;
           if (!a.avgScore) a.avgScore = ((s.gpt + s.claude + s.gemini + s.grok + s.pplx) / 5).toFixed(1);
@@ -3688,6 +3589,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
           a.tags = a.tags || [];
         });
         statusEl.textContent = 'Scored with baseline estimates...';
+        showToast('AI scoring unavailable - showing estimated scores');
       }
 
       // Ensure all logos lit
@@ -3922,12 +3824,12 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
           </div>
         </div>
         <div class="card-body">
-          <div class="card-source">${article.source} <span class="sentiment-badge ${sentiment}">${sentimentLabel}</span></div>
+          <div class="card-source">${escapeHtml(article.source)} <span class="sentiment-badge ${sentiment}">${escapeHtml(sentimentLabel)}</span></div>
           ${tagsHtml}
-          <h2 class="card-title">${article.title}</h2>
-          <p class="card-summary">${(article.summary || '').slice(0, 120)}${(article.summary || '').length > 120 ? '...' : ''}</p>
+          <h2 class="card-title">${escapeHtml(article.title)}</h2>
+          <p class="card-summary">${escapeHtml((article.summary || '').slice(0, 120))}${(article.summary || '').length > 120 ? '...' : ''}</p>
           <div class="card-topics">
-            ${topics.map(t => `<span class="card-topic">${t}</span>`).join('')}
+            ${topics.map(t => `<span class="card-topic">${escapeHtml(t)}</span>`).join('')}
           </div>
           <div class="card-meta">
             <span>${article.date || 'Today'}</span>
@@ -3936,7 +3838,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
           <div class="ai-scores-section">
             <div style="text-align: center; margin-bottom: 6px;">
               <span style="font-size: 18px; font-weight: 700; color: var(--gold);">${Math.round((gptScore + claudeScore + geminiScore + grokScore + pplxScore) / 5)}%</span>
-              <span style="font-size: 10px; color: #888; margin-left: 4px;">avg</span>
+              <span style="font-size: 10px; color: #888; margin-left: 4px;">avg${article.estimatedScores ? ' (est.)' : ''}</span>
             </div>
             <div style="display: flex; justify-content: space-around; gap: 4px;">
               <div class="ai-score-item" data-ai="gpt" data-score="${gptScore}" data-article-id="${article.id}" style="display: flex; flex-direction: column; align-items: center; cursor: pointer;">
@@ -4009,8 +3911,20 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
       document.body.appendChild(popup);
     }
 
+    // Track document-level mouse handlers so we can clean them up
+    let _swipeMouseMoveHandler = null;
+    let _swipeMouseUpHandler = null;
+
     function setupSwipe(card) {
       if (!card) return;
+
+      // Remove previous document-level mouse handlers to prevent leak
+      if (_swipeMouseMoveHandler) {
+        document.removeEventListener('mousemove', _swipeMouseMoveHandler);
+      }
+      if (_swipeMouseUpHandler) {
+        document.removeEventListener('mouseup', _swipeMouseUpHandler);
+      }
 
       let startX = 0, startY = 0;
       let currentX = 0, currentY = 0;
@@ -4093,7 +4007,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
         card.classList.add('dragging');
       });
 
-      document.addEventListener('mousemove', (e) => {
+      _swipeMouseMoveHandler = (e) => {
         if (!isDragging) return;
 
         currentX = e.clientX - startX;
@@ -4101,9 +4015,10 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
 
         const rotation = currentX * 0.1;
         card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotation}deg)`;
-      });
+      };
+      document.addEventListener('mousemove', _swipeMouseMoveHandler);
 
-      document.addEventListener('mouseup', () => {
+      _swipeMouseUpHandler = () => {
         if (!isDragging) return;
         isDragging = false;
         card.classList.remove('dragging');
@@ -4134,7 +4049,8 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
 
         currentX = 0;
         currentY = 0;
-      });
+      };
+      document.addEventListener('mouseup', _swipeMouseUpHandler);
     }
 
     function handleSwipe(direction, card) {
@@ -4179,18 +4095,6 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
         currentCardIndex++;
         renderCards();
       }, 300);
-    }
-
-    function addToFavorites(article) {
-      if (!favorites.find(f => f.id === article.id)) {
-        favorites.unshift(article);
-        localStorage.setItem('ai-radar-favorites', JSON.stringify(favorites));
-        updateFavCount();
-      }
-    }
-
-    function updateFavCount() {
-      document.getElementById('fav-count').textContent = favorites.length;
     }
 
     // SAVE FOR LATER
@@ -4246,11 +4150,11 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
 
       // Generate AI consensus text - each on its own line (scores as percentages)
       const consensusTexts = [
-        `<strong>GPT</strong> (${mGpt}%): ${article.rationales?.gpt || 'High relevance score'}`,
-        `<strong>Claude</strong> (${mClaude}%): ${article.rationales?.claude || 'Well-sourced content'}`,
-        `<strong>Gemini</strong> (${mGemini}%): ${article.rationales?.gemini || 'Good engagement potential'}`,
-        `<strong>Grok</strong> (${mGrok}%): ${article.rationales?.grok || 'Trending topic'}`,
-        `<strong>Perplexity</strong> (${mPplx}%): ${article.rationales?.pplx || 'Multiple sources verified'}`
+        `<strong>GPT</strong> (${mGpt}%): ${escapeHtml(article.rationales?.gpt || 'High relevance score')}`,
+        `<strong>Claude</strong> (${mClaude}%): ${escapeHtml(article.rationales?.claude || 'Well-sourced content')}`,
+        `<strong>Gemini</strong> (${mGemini}%): ${escapeHtml(article.rationales?.gemini || 'Good engagement potential')}`,
+        `<strong>Grok</strong> (${mGrok}%): ${escapeHtml(article.rationales?.grok || 'Trending topic')}`,
+        `<strong>Perplexity</strong> (${mPplx}%): ${escapeHtml(article.rationales?.pplx || 'Multiple sources verified')}`
       ];
       document.getElementById('modal-consensus').innerHTML = consensusTexts.join('<br>');
 
@@ -4410,7 +4314,8 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
             link: selectedArticle.link || selectedArticle.url || '',
             avg_score: selectedArticle.avg_score || 85,
             preview_only: true  // Generate but don't post - let user review first
-          })
+          }),
+          signal: AbortSignal.timeout(15000)
         });
 
         if (response.ok) {
@@ -4565,113 +4470,6 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
     }
 
     // ============================================
-    // DETAIL SCREEN
-    // ============================================
-    function showDetailScreen(article) {
-      selectedArticle = article;
-
-      // Set image
-      const imageUrl = article.image || 'assets/logo-white.png';
-      const detailImage = document.getElementById('detail-image');
-      detailImage.style.backgroundImage = `url('${imageUrl}')`;
-      if (!article.image) {
-        detailImage.style.backgroundSize = '60px 60px';
-        detailImage.style.backgroundRepeat = 'no-repeat';
-        detailImage.style.backgroundPosition = 'center';
-      } else {
-        detailImage.style.backgroundSize = 'cover';
-      }
-
-      document.getElementById('detail-source').textContent = article.source;
-      document.getElementById('detail-title').textContent = article.title;
-      document.getElementById('detail-summary').textContent = article.summary;
-
-      document.getElementById('score-gpt').textContent = Math.round(article.scores?.gpt || 80) + '%';
-      document.getElementById('score-claude').textContent = Math.round(article.scores?.claude || 80) + '%';
-      document.getElementById('score-gemini').textContent = Math.round(article.scores?.gemini || 80) + '%';
-      document.getElementById('score-grok').textContent = Math.round(article.scores?.grok || 80) + '%';
-      document.getElementById('score-pplx').textContent = Math.round(article.scores?.pplx || 80) + '%';
-
-      showScreen('detail');
-    }
-
-    function selectLength(length) {
-      selectedLength = length;
-      document.querySelectorAll('.length-btn').forEach(b => b.classList.remove('selected'));
-      document.querySelector(`.length-btn[data-length="${length}"]`).classList.add('selected');
-    }
-
-    // ============================================
-    // PIPELINE
-    // ============================================
-    function startPipeline() {
-      showScreen('pipeline');
-
-      document.getElementById('pipeline-progress').style.display = 'block';
-      document.getElementById('pipeline-success').classList.remove('show');
-
-      // Reset steps
-      document.querySelectorAll('.pipeline-step').forEach(s => {
-        s.classList.remove('active', 'done');
-      });
-
-      runPipeline();
-    }
-
-    async function runPipeline() {
-      const steps = ['analyze', 'slides', 'review', 'post'];
-      let progress = 0;
-
-      for (let i = 0; i < steps.length; i++) {
-        const step = steps[i];
-        const stepEl = document.getElementById('step-' + step);
-        stepEl.classList.add('active');
-
-        const messages = {
-          analyze: 'Analyzing article content...',
-          slides: 'Generating carousel slides...',
-          review: 'AI reviewing content...',
-          post: 'Finalizing presentation...'
-        };
-
-        document.getElementById('progress-message').textContent = messages[step];
-
-        // Animate progress
-        const startProgress = progress;
-        const endProgress = (i + 1) * 25;
-
-        for (let p = startProgress; p <= endProgress; p += 2) {
-          updateProgress(p);
-          await sleep(50);
-        }
-
-        progress = endProgress;
-        stepEl.classList.remove('active');
-        stepEl.classList.add('done');
-
-        await sleep(500);
-      }
-
-      // Go to results screen for human review
-      showResultsScreen();
-    }
-
-    function updateProgress(percent) {
-      const circumference = 2 * Math.PI * 90;
-      const offset = circumference - (percent / 100) * circumference;
-
-      document.getElementById('progress-fill').style.strokeDashoffset = offset;
-      document.getElementById('progress-percent').textContent = percent + '%';
-    }
-
-    function resetAndGoHome() {
-      currentCardIndex++;
-      selectedArticle = null;
-      showScreen('swipe');
-      renderCards();
-    }
-
-    // ============================================
     // SAVED ARTICLES
     // ============================================
     function renderFavorites() {
@@ -4702,13 +4500,13 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
         return `
           <div class="favorite-item" data-id="${article.id}" onclick="toggleFavExpand(this)">
             <button class="delete-x" onclick="event.stopPropagation(); deleteSavedArticle(${article.id})">×</button>
-            <div class="fav-source">${article.source}</div>
-            <div class="fav-title">${article.title}</div>
+            <div class="fav-source">${escapeHtml(article.source)}</div>
+            <div class="fav-title">${escapeHtml(article.title)}</div>
             <div class="fav-topics">
-              ${topics.map(t => `<span class="fav-topic">${t}</span>`).join('')}
+              ${topics.map(t => `<span class="fav-topic">${escapeHtml(t)}</span>`).join('')}
             </div>
             <div class="fav-meta">
-              <span>${article.date || 'Today'}</span>
+              <span>${escapeHtml(article.date || 'Today')}</span>
               <span style="font-weight: 700; color: ${wordCount >= 150 ? '#22c55e' : wordCount >= 80 ? '#eab308' : '#ef4444'};">${wordCount}w</span>
             </div>
             <div class="fav-scores">
@@ -4722,7 +4520,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
               </div>
             </div>
             <div class="fav-expanded" style="display: none;">
-              <div class="fav-description">${summary}</div>
+              <div class="fav-description">${escapeHtml(summary)}</div>
               <button class="fav-create-btn" onclick="event.stopPropagation(); postFavorite(${article.id})">Create Carousel</button>
             </div>
           </div>
@@ -4796,9 +4594,14 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
     let totalSlides = 5;
     let generatedSlides = [];
 
+    let _flipbookInitialized = false;
     function initFlipbook() {
       const flipbook = document.getElementById('flipbook');
       if (!flipbook) return;
+
+      // Prevent duplicate listeners on re-init
+      if (_flipbookInitialized) return;
+      _flipbookInitialized = true;
 
       let startX = 0;
       let isDragging = false;
@@ -4935,8 +4738,8 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
         <div class="flip-slide ${i === 0 ? 'active' : ''}" data-slide="${i + 1}">
           <div class="slide-content">
             <div class="slide-number">${i + 1}</div>
-            <div class="slide-title">${slide.title}</div>
-            ${slide.body ? `<div class="slide-body">${slide.body}</div>` : ''}
+            <div class="slide-title">${escapeHtml(slide.title)}</div>
+            ${slide.body ? `<div class="slide-body">${escapeHtml(slide.body)}</div>` : ''}
           </div>
         </div>
       `).join('');
@@ -5034,7 +4837,7 @@ Return JSON: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"
       }
 
       showScreen('results');
-      if (!gammaUrl) initFlipbook();
+      initFlipbook();
     }
 
     function showSuccessModal(gammaUrl = '') {

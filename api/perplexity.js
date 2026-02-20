@@ -25,18 +25,8 @@ export default async function handler(req, res) {
       return res.status(429).json({ error: 'Rate limited by Perplexity. Try again shortly.' });
     }
 
-    const text = await response.text();
-    try {
-      const data = JSON.parse(text);
-      res.status(response.status).json(data);
-    } catch (parseErr) {
-      res.status(response.status).json({
-        error: `Perplexity returned status ${response.status}`,
-        keyPrefix: API_KEY.substring(0, 8) + '...',
-        keyLength: API_KEY.length,
-        bodyPreview: text.substring(0, 200)
-      });
-    }
+    const data = await response.json();
+    res.status(response.status).json(data);
   } catch (err) {
     if (err.name === 'TimeoutError') {
       return res.status(504).json({ error: 'Perplexity API request timed out' });

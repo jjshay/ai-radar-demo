@@ -2982,6 +2982,54 @@
       return Math.max(0, Math.min(100, n));
     }
 
+    // --- Scoring Cache (localStorage) ---
+    function getScoringCacheKey(topic) {
+      const today = new Date().toISOString().slice(0, 10);
+      return `ai-radar-scores-${topic.toLowerCase().replace(/\s+/g, '-')}-${today}`;
+    }
+
+    function loadScoringCache(topic) {
+      try {
+        const key = getScoringCacheKey(topic);
+        const cached = localStorage.getItem(key);
+        if (!cached) return null;
+        const data = JSON.parse(cached);
+        // Cache valid for 4 hours
+        if (Date.now() - data.timestamp > 4 * 60 * 60 * 1000) {
+          localStorage.removeItem(key);
+          return null;
+        }
+        console.log(`Loaded ${data.articles.length} cached scored articles for "${topic}"`);
+        return data.articles;
+      } catch (e) { return null; }
+    }
+
+    function saveScoringCache(topic, scoredArticles) {
+      try {
+        const key = getScoringCacheKey(topic);
+        // Clean old caches (keep only last 5 topics)
+        const allKeys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('ai-radar-scores-')) allKeys.push(k);
+        }
+        if (allKeys.length > 5) {
+          allKeys.sort();
+          allKeys.slice(0, allKeys.length - 5).forEach(k => localStorage.removeItem(k));
+        }
+        localStorage.setItem(key, JSON.stringify({
+          timestamp: Date.now(),
+          articles: scoredArticles.map(a => ({
+            title: a.title, source: a.source, url: a.url, date: a.date,
+            summary: a.summary, words: a.words, image: a.image, id: a.id,
+            scores: a.scores, avgScore: a.avgScore, rationales: a.rationales,
+            sentiment: a.sentiment, tags: a.tags
+          }))
+        }));
+        console.log(`Cached ${scoredArticles.length} scored articles for "${topic}"`);
+      } catch (e) { console.warn('Cache save failed:', e.message); }
+    }
+
     async function runAIScoring() {
       const aiModels = ['gpt', 'claude', 'gemini', 'grok', 'pplx'];
       const aiNames = { gpt: 'ChatGPT', claude: 'Claude', gemini: 'Gemini', grok: 'Grok', pplx: 'Perplexity' };
@@ -2990,6 +3038,25 @@
 
       if (!statusEl || !countEl) {
         console.error('Scoring elements not found');
+        return;
+      }
+
+      // Check cache first
+      const cached = loadScoringCache(selectedTopic);
+      if (cached && cached.length > 0) {
+        statusEl.textContent = 'Loading cached scores...';
+        countEl.textContent = `${cached.length} articles (cached)`;
+        articles = cached;
+        // Quick animation - light up all logos
+        aiModels.forEach((ai, idx) => {
+          setTimeout(() => {
+            const el = document.getElementById(`score-${ai}`);
+            if (el) { el.style.opacity = '1'; el.style.transform = 'scale(1.1)'; setTimeout(() => el.style.transform = 'scale(1)', 200); }
+          }, idx * 150);
+        });
+        await sleep(800);
+        statusEl.textContent = 'Complete! Ranking by AI scores...';
+        countEl.textContent = `${articles.length} articles scored`;
         return;
       }
 
@@ -3009,18 +3076,13 @@
         batches.push({ start: i, items: articles.slice(i, i + BATCH_SIZE) });
       }
 
-      let scoredCount = 0;
-      let allResults = [];
-      let apiSuccess = false;
+      // --- Score ALL batches in PARALLEL ---
+      const batchPromises = batches.map((batch, batchIdx) => {
+        const articleList = batch.items.map((a, i) =>
+          `[${i}] "${a.title}" (source: ${a.source}, date: ${a.date || 'unknown'}, ${a.words || 0} words)\nSummary: ${(a.summary || 'No summary').substring(0, 400)}`
+        ).join('\n\n');
 
-      for (let batchIdx = 0; batchIdx < batches.length; batchIdx++) {
-        try {
-          const batch = batches[batchIdx];
-          const articleList = batch.items.map((a, i) =>
-            `[${i}] "${a.title}" (source: ${a.source}, date: ${a.date || 'unknown'}, ${a.words || 0} words)\nSummary: ${(a.summary || 'No summary').substring(0, 400)}`
-          ).join('\n\n');
-
-          const prompt = `You are scoring ${batch.items.length} articles about "${selectedTopic}" from 5 AI perspectives for a professional audience.
+        const prompt = `You are scoring ${batch.items.length} articles about "${selectedTopic}" from 5 AI perspectives for a professional audience.
 
 Perspectives:
 - GPT: writing quality, clarity, breadth of impact, actionability
@@ -3042,61 +3104,71 @@ ${articleList}
 
 Return JSON only: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok":90,"pplx":80},"rationales":{"gpt":"...","claude":"...","gemini":"...","grok":"...","pplx":"..."},"sentiment":"positive","tags":["Trending"]}]}`;
 
-          // Animate - light up logo for current batch
-          const modelIdx = Math.min(batchIdx * 2, 4);
-          statusEl.textContent = `${aiNames[aiModels[modelIdx]]} analyzing batch ${batchIdx + 1}...`;
-
-          const resp = await fetch('/api/grok', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: 'grok-3-mini',
-              messages: [{ role: 'user', content: prompt }],
-              temperature: 0.3
-            }),
-            signal: AbortSignal.timeout(20000)
-          });
-
-          const data = await resp.json();
-
+        return fetch('/api/grok', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'grok-3-mini',
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.3
+          }),
+          signal: AbortSignal.timeout(45000)
+        }).then(r => r.json()).then(data => {
           if (data.choices?.[0]?.message?.content) {
             let content = data.choices[0].message.content;
-            // Strip markdown code fences aggressively
             content = content.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '').trim();
-            // Try to extract JSON object if surrounded by other text
             const jsonMatch = content.match(/\{[\s\S]*\}/);
             if (jsonMatch) content = jsonMatch[0];
-
-            try {
-              const parsed = JSON.parse(content);
-              if (parsed.results && Array.isArray(parsed.results)) {
-                allResults = [...allResults, ...parsed.results];
-                scoredCount += batch.items.length;
-                apiSuccess = true;
-              }
-            } catch (parseErr) {
-              console.warn(`Batch ${batchIdx + 1} JSON parse failed:`, parseErr.message, content.substring(0, 200));
+            const parsed = JSON.parse(content);
+            if (parsed.results && Array.isArray(parsed.results)) {
+              return { batchIdx, results: parsed.results, count: batch.items.length };
             }
           }
-
-          // Light up logos proportional to progress
-          const progress = (batchIdx + 1) / batches.length;
-          const logosToLight = Math.ceil(progress * aiModels.length);
-          for (let k = 0; k < logosToLight; k++) {
-            const el = document.getElementById(`score-${aiModels[k]}`);
-            if (el && el.style.opacity !== '1') {
-              el.style.opacity = '1';
-              el.style.transform = 'scale(1.1)';
-              setTimeout(() => el.style.transform = 'scale(1)', 200);
-            }
-          }
-
-          countEl.textContent = `${scoredCount} of ${articles.length} articles scored`;
-          if (batchIdx < batches.length - 1) await sleep(300);
-        } catch (err) {
+          return { batchIdx, results: [], count: 0 };
+        }).catch(err => {
           console.error(`AI Scoring batch ${batchIdx + 1} error:`, err);
+          return { batchIdx, results: [], count: 0 };
+        });
+      });
+
+      // Animate logos while waiting - cycle through them every 2s
+      let animInterval = setInterval(() => {
+        const nextIdx = Math.floor(Math.random() * aiModels.length);
+        const el = document.getElementById(`score-${aiModels[nextIdx]}`);
+        if (el) {
+          el.style.opacity = '1';
+          el.style.transform = 'scale(1.15)';
+          setTimeout(() => { el.style.transform = 'scale(1)'; }, 300);
+        }
+      }, 800);
+
+      statusEl.textContent = `All 5 AI models scoring ${articles.length} articles in parallel...`;
+
+      // Wait for all batches to complete
+      const batchResults = await Promise.allSettled(batchPromises);
+
+      clearInterval(animInterval);
+
+      // Merge results in order
+      let allResults = [];
+      let apiSuccess = false;
+      let scoredCount = 0;
+
+      // Sort by batchIdx to maintain article order
+      const ordered = batchResults
+        .filter(r => r.status === 'fulfilled' && r.value)
+        .map(r => r.value)
+        .sort((a, b) => a.batchIdx - b.batchIdx);
+
+      for (const batch of ordered) {
+        if (batch.results.length > 0) {
+          allResults = [...allResults, ...batch.results];
+          scoredCount += batch.count;
+          apiSuccess = true;
         }
       }
+
+      countEl.textContent = `${scoredCount} of ${articles.length} articles scored`;
 
       // Merge results into articles
       if (apiSuccess && allResults.length > 0) {
@@ -3119,6 +3191,8 @@ Return JSON only: {"results":[{"scores":{"gpt":82,"claude":78,"gemini":85,"grok"
         }
         statusEl.textContent = 'Complete! Ranking by AI scores...';
         console.log('AI scoring complete (real)', allResults.length, 'results');
+        // Save to cache
+        saveScoringCache(selectedTopic, articles);
       } else {
         // Fallback: random scores (marked as estimates)
         console.log('AI scoring failed, using fallback');

@@ -1,5 +1,10 @@
 # AI Radar Demo
 
+<!-- portfolio-navigation:start -->
+[Project brief](docs/PROJECT_BRIEF.md) · [Structured project record](project.json) · [Portfolio](https://github.com/jjshay)
+
+<!-- portfolio-navigation:end -->
+
 > Swipe through AI news like a deck of cards, score it with multiple AI models, listen to voice summaries, and export any story as a LinkedIn-ready Gamma presentation.
 
 **Live:** [ai-radar-demo.vercel.app](https://ai-radar-demo.vercel.app)

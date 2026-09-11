@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "name": "ai-radar-demo",
+  "title": "AI Radar Discovery",
+  "category": "Content operations",
+  "summary": "An operator needs to select worthwhile AI stories and turn selected stories into reusable content.",
+  "status": "Source available; runtime not revalidated in this documentation review",
+  "visibility": "public",
+  "reviewed_on": "2026-09-11",
+  "reviewed_commit": "8c644bdc680ca1518752fc71d1019132564c573e",
+  "architecture": "News provider proxies \u2192 swipe selection \u2192 AI scoring \u2192 Gamma generation \u2192 status polling.",
+  "evidence": [
+    {
+      "path": "api/gamma.js",
+      "role": "Implementation component supporting the data flow described above."
+    },
+    {
+      "path": "api/gamma-status.js",
+      "role": "Implementation component supporting the data flow described above."
+    },
+    {
+      "path": "api/grok.js",
+      "role": "Implementation component supporting the data flow described above."
+    }
+  ],
+  "validation": "Repository tree and referenced source reviewed. Existing application tests, hosted deployments, paid providers, and external mutations were not re-run in this documentation review.",
+  "limitations": "Thin serverless adapters keep the frontend small, while rate limits and asynchronous provider status remain part of the product contract.",
+  "next_improvement": "Record a reproducible story-to-presentation walkthrough with provider failures and timeout behavior.",
+  "related_repositories": [
+    "ai-radar-backend",
+    "ai-radar-mobile",
+    "art-catalog-automation",
+    "gauntlet-blog-engine",
+    "gauntlet-shopify-seed"
+  ]
+}
